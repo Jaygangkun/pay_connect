@@ -113,5 +113,6 @@ $route['api-load-user-activities'] = 'DashboardController/apiLoadUserActivities'
 
 $route['api-department-add'] = 'DashboardController/apiDepartmentAdd';
 
+$route['api-auto-logout'] = 'DashboardController/apiAutoLogout';
 // Global APIS
 $route['pay-update'] = 'APIController/payUpdate';

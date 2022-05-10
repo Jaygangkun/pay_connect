@@ -106,7 +106,7 @@
 		<!-- Main Sidebar Container -->
 		<aside class="main-sidebar sidebar-dark-primary elevation-4">
 			<!-- Brand Logo -->
-			<a href="./index.html" class="brand-link">
+			<a href="<?= base_url('/') ?>" class="brand-link">
 				<img src="<?= base_url() ?>assets/dist/img/favicon-32x32.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
 				<span class="brand-text font-weight-light">Pay Connect</span>
 			</a>
@@ -157,8 +157,32 @@
 	<!-- ./wrapper -->
 
 	<script>
-	
-	// DropzoneJS Demo Code End
+		let inactivityTime = function () {
+			let time;
+			window.onload = resetTimer;
+			document.onmousemove = resetTimer;
+			document.onkeypress = resetTimer;
+			function logout() {
+				$.ajax({
+					url: base_url + 'api-auto-logout',
+					type: 'post',
+					dataType: 'json',
+					data: {
+						user_id: <?php echo $_SESSION['user_id']?>
+					},
+					success: function(resp) {
+						if(!resp.success) {
+							location.reload();
+						}
+					}
+				})
+			}
+			function resetTimer() {
+				clearTimeout(time);
+				time = setTimeout(logout, 1000 * 60 * 5); // 5mins
+			}
+		};
+		inactivityTime();
 	</script>
 </body>
 </html>

@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="<?= base_url() ?>assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="<?= base_url() ?>assets/dist/css/adminlte.min.css">
+	<link rel="stylesheet" href="<?= base_url() ?>assets/dist/css/custom.css">
 </head>
 <body class="hold-transition login-page">
     <div class="login-box">
@@ -28,7 +29,7 @@
     
         <div class="card card-outline card-primary">
             <div class="card-header text-center">
-            	<a href="index.html" class="h1"><img src="<?= base_url() ?>assets/dist/img/logo.png" style="width:100%"/></a>
+            	<a href="<?= base_url('/') ?>" class="h1"><img src="<?= base_url() ?>assets/dist/img/logo.png" style="width:100%"/></a>
             </div>
             <div class="card-body">
 				<?php if($this->session->flashdata('warning')): ?>

@@ -943,4 +943,22 @@ class DashboardController extends CI_Controller {
 			'html' => $html
 		));
 	}
+
+	public function apiAutoLogout() {
+		if(isset($_POST['user_id'])) {
+			$this->UserActivities->add(array(
+				'user_id' => $_POST['user_id'],
+				'ip' => getIP(),
+				'activity' => 'logout'
+			));
+	
+			$this->Users->updateLoginStatus($_POST['user_id'], 0);
+
+			unset($_SESSION['user_id']);
+			
+			echo json_encode(array(
+				'success' => false
+			));
+		}
+	}
 }

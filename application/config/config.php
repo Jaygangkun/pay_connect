@@ -384,7 +384,8 @@ $config['encryption_key'] = '';
 */
 $config['sess_driver'] = 'files';
 $config['sess_cookie_name'] = 'ci_session';
-$config['sess_expiration'] = 7200;
+// $config['sess_expiration'] = 7200;
+$config['sess_expiration'] = 60 * 5; // 5 mins
 $config['sess_save_path'] = NULL;
 // $config['sess_save_path'] = sys_get_temp_dir();
 $config['sess_match_ip'] = FALSE;

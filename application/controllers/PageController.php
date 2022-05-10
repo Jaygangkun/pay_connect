@@ -113,13 +113,16 @@ class PageController extends CI_Controller {
 	}
 
 	public function logout() {
-		$this->UserActivities->add(array(
-			'user_id' => $_SESSION['user_id'],
-			'ip' => getIP(),
-			'activity' => 'logout'
-		));
-
-		$this->Users->updateLoginStatus($_SESSION['user_id'], 0);
+		if(isset($_SESSION['user_id'])) {
+			$this->UserActivities->add(array(
+				'user_id' => $_SESSION['user_id'],
+				'ip' => getIP(),
+				'activity' => 'logout'
+			));
+	
+			$this->Users->updateLoginStatus($_SESSION['user_id'], 0);
+		}
+		
 
 		unset($_SESSION['user_id']);
 		$this->load->view('auth/login');
@@ -258,175 +261,4 @@ class PageController extends CI_Controller {
 		$this->load->view('dashboard/basic', $data);
 	}
 
-	public function verify($token){
-		$result = $this->Users->email_verification($token);
-		if($result){
-			$this->session->set_flashdata('success', 'Your email has been verified, you can now login.');	
-			redirect(base_url('/login'));
-		}
-		else{
-			$this->session->set_flashdata('error', 'The url is either invalid or you already have activated your account.');	
-			redirect(base_url('/login'));
-		}	
-	}
-
-	public function profile(){
-		if($this->input->post('submit')){
-		                
-			$this->form_validation->set_rules('username', 'Username', 'trim|required');
-			$this->form_validation->set_rules('first_name', 'Firstname', 'trim|required');
-			$this->form_validation->set_rules('last_name', 'Lastname', 'trim|required');
-			$this->form_validation->set_rules('email', 'Email', 'trim|valid_email|required');
-			$this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[5]');
-			$this->form_validation->set_rules('confirm_password', 'Password Confirmation', 'trim|required|matches[password]');
-
-			if ($this->form_validation->run() == FALSE) {
-				$this->load->view('admin/profile', array(
-					'username' => $this->input->post('username'),
-					'first_name' => $this->input->post('first_name'),
-					'last_name' => $this->input->post('last_name'),
-					'email' => $this->input->post('email')
-				));
-			}
-			else{
-				$update_result = $this->Users->updateProfile(
-					isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '', array(
-					'username' => $this->input->post('username'), 
-					'email' => $this->input->post('email'), 
-					'password' => $this->input->post('password'),
-					'first_name' => $this->input->post('first_name'),
-					'last_name' => $this->input->post('last_name')
-				));
-
-				if($update_result){
-					$this->session->set_flashdata('success', 'Profile updated successfully.');	
-					redirect(base_url('/profile'));
-				}
-				else{
-					$this->session->set_flashdata('error', 'Profile updating failed.');	
-					redirect(base_url('/profile'));
-				}
-			}
-		}
-		else{
-			
-			$users = $this->Users->getByID(isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '');
-
-			if(count($users) > 0){
-				$user = $users[0];
-				$this->load->view('admin/profile', array(
-					'username' => $user['username'],
-					'first_name' => $user['first_name'],
-					'last_name' => $user['last_name'],
-					'email' => $user['email']
-				));
-			}
-			else{
-				redirect(base_url('/login'));
-			}
-		}
-	}
-
-	public function userEdit($user_id){
-		if(isset($_SESSION['role']) && $_SESSION['role'] != 'admin'){
-			redirect(base_url('/'));
-		}
-
-		if($this->input->post('submit')){
-			$this->form_validation->set_rules('username', 'Username', 'trim|required');
-			$this->form_validation->set_rules('first_name', 'Firstname', 'trim|required');
-			$this->form_validation->set_rules('last_name', 'Lastname', 'trim|required');
-			$this->form_validation->set_rules('email', 'Email', 'trim|valid_email|required');
-
-			if ($this->form_validation->run() == FALSE) {
-				$this->load->view('admin/user-edit', array(
-					'user_id' => $user_id,
-					'username' => $this->input->post('username'),
-					'first_name' => $this->input->post('first_name'),
-					'last_name' => $this->input->post('last_name'),
-					'email' => $this->input->post('email'),
-					'is_verify' => $this->input->post('is_verify') ? '1' : '',
-					'is_active' => $this->input->post('is_active') ? '1' : ''
-				));
-			}
-			else{
-				$update_result = $this->Users->updateUser(
-					$user_id, array(
-					'username' => $this->input->post('username'), 
-					'email' => $this->input->post('email'), 
-					'first_name' => $this->input->post('first_name'),
-					'last_name' => $this->input->post('last_name'),
-					'is_verify' => $this->input->post('is_verify') ? '1' : '',
-					'is_active' => $this->input->post('is_active') ? '1' : ''
-				));
-
-				if($update_result){
-					$this->session->set_flashdata('success', 'Updated successfully.');	
-					redirect(base_url('/user-edit/'.$user_id));
-				}
-				else{
-					$this->session->set_flashdata('error', 'Updated failed.');	
-					redirect(base_url('/user-edit/'.$user_id));
-				}
-			}
-		}
-		else{
-			$users = $this->Users->getByID($user_id);
-
-			if(count($users) > 0){
-				$user = $users[0];
-				$this->load->view('admin/user-edit', array(
-					'user_id' => $user_id,
-					'username' => $user['username'],
-					'first_name' => $user['first_name'],
-					'last_name' => $user['last_name'],
-					'email' => $user['email'],
-					'is_verify' => $user['is_verify'],
-					'is_active' => $user['is_active']
-				));
-			}
-		}
-	}
-
-	public function userNew(){
-		if($this->input->post('submit')){
-			$this->form_validation->set_rules('username', 'Username', 'trim|required|is_unique[users.username]');
-			$this->form_validation->set_rules('first_name', 'Firstname', 'trim|required');
-			$this->form_validation->set_rules('last_name', 'Lastname', 'trim|required');
-			$this->form_validation->set_rules('email', 'Email', 'trim|valid_email|is_unique[users.email]|required');
-			$this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[5]');
-			$this->form_validation->set_rules('confirm_password', 'Password Confirmation', 'trim|required|matches[password]');
-
-			if ($this->form_validation->run() == FALSE) {
-				$this->load->view('admin/user-new', array(
-					'username' => $this->input->post('username'),
-					'first_name' => $this->input->post('first_name'),
-					'last_name' => $this->input->post('last_name'),
-					'email' => $this->input->post('email'),
-					'is_verify' => $this->input->post('is_verify') ? '1' : '',
-					'is_active' => $this->input->post('is_active') ? '1' : ''
-				));
-			}
-			else{
-				
-				$added_user_id = $this->Users->addNew(array(
-					'username' => $this->input->post('username'), 
-					'email' => $this->input->post('email'), 
-					'password' => $this->input->post('password'),
-					'first_name' => $this->input->post('first_name'),
-					'last_name' => $this->input->post('last_name'),
-					'is_verify' => $this->input->post('is_verify') ? '1' : '',
-					'is_active' => $this->input->post('is_active') ? '1' : ''
-				));
-
-				if($added_user_id){
-					$this->session->set_flashdata('success', 'Your Account has been made, please verify it by clicking the activation link that has been send to your email.');	
-					redirect(base_url('/user-new'));
-				}
-			}
-		}
-		else{
-			$this->load->view('admin/user-new');
-		}
-	}
 }
