@@ -45,7 +45,7 @@
         </div>
         <div class="row mt-4">
           <div class="col-md-12">
-            <table id="dataTable" class="table table-bordered table-striped">
+            <table id="batch_records" class="table table-bordered table-striped">
               <thead>
                 <tr>
                   <th>Transaction Ref</th>
@@ -59,35 +59,7 @@
                 </tr>
               </thead>
               <tbody>
-                <?php
-                $record_index = 0;
-                foreach($records as $record) {
-                  ?>
-                  <tr>
-                    <td><?php echo $record['transaction_ref']?></td>
-                    <td><?php echo $record['beneficiary_name']?></td>
-                    <td><?php echo $record['account_number']?></td>
-                    <td><?php echo $record['amount_pay']?></td>
-                    <td><?php echo $record['department']?></td>
-                    <td><?php echo $record['benef_bank']?></td>
-                    <td><?php echo $record['bank_biccode']?></td>
-                    <td>
-                      <?php
-                      if($record['status'] == '1') {
-                        echo "Submitted";
-                      }
-                      else if($record['status'] == '2') {
-                        echo "Error";
-                      }
-                      else if($record['status'] == '3') {
-                        echo "Pending";
-                      }
-                      ?>
-                    </td>
-                  </tr>
-                  <?php
-                }
-                ?>
+                
               </tbody>
             </table>
           </div>
@@ -97,3 +69,18 @@
   </div><!-- /.container-fluid -->
 </section>
 <!-- /.content -->
+<script>
+  var table_batch_records = $('#batch_records').DataTable({
+		"pagingType": 'full_numbers',
+		"paging": true,
+		"lengthChange": false,
+		"searching": false,
+		"ordering": true,
+		"info": true,
+		"autoWidth": false,
+		"responsive": true,
+    'ajax': {
+      url: base_url + 'api-load-batch-records/<?php echo $batch_file_id?>',
+    }
+	});
+</script>

@@ -37,7 +37,7 @@
             <div class="col-auto">
               <span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
             </div>
-            <div class="col d-flex align-items-center">
+            <div class="col-5">
               <p class="mb-0 mr-3">
                 <span class="lead" data-dz-name></span>
                 (<span data-dz-size></span>)
@@ -132,28 +132,7 @@
       node.textContent = 'Successfully!';
     }
 
-    message = JSON.parse(message);
-    table_batch_files.row.add([
-      table_batch_files.rows().count() + 1,
-      message.account,
-      message.date,
-      message.batch_number,
-      message.batch_amount,
-      message.currency,
-      message.total_records,
-      '',
-      `<div class="btn-group btn-group-actions">
-          <button type="button" class="btn btn-default">Action</button>
-          <button type="button" class="btn btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown">
-            <span class="sr-only">Toggle Dropdown</span>
-          </button>
-          <div class="dropdown-menu" role="menu">
-            <span class="dropdown-item action-view" data-id="${message.id}">View</span>
-            <span class="dropdown-item action-delete" data-id="${message.id}">Delete</span>
-            <span class="dropdown-item action-submit" data-id="${message.id}">Submit</span>
-          </div>
-        </div>`
-    ]).draw(false);
+    table_batch_files.ajax.reload();
   })
 
   myDropzone.on("error", function(file, message) {
@@ -166,7 +145,7 @@
       for (let node of file.previewElement.querySelectorAll(
         "[data-dz-errormessage]"
       )) {
-        node.textContent = message;
+        node.innerHTML = message;
       }
     }
 
@@ -187,7 +166,10 @@
 	});
   
   $(document).on('click', '.action-submit', function() {
-    // alert($(this).attr('data-id'));
+    var btn_group_wrap = $(this).parents('.btn-group-wrap');
+    $(btn_group_wrap).addClass('loading');
+    $(btn_group_wrap).find('.btn').addClass('disabled');
+    
     $.ajax({
       url: base_url + 'api-submit-batch-file',
       type: 'post',
@@ -196,6 +178,8 @@
         id: $(this).attr('data-id')
       },
       success: function(resp) {
+        $(btn_group_wrap).removeClass('loading');
+        $(btn_group_wrap).find('.btn').removeClass('disabled');
         if(resp.success) {
           table_batch_files.ajax.reload();
         }

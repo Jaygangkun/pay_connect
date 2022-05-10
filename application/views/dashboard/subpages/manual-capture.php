@@ -12,7 +12,7 @@
                                 <div class="form-group">
                                     <label for="batch_ref">Batch Ref Number</label>
                                     <div class="input-group">
-                                        <input type="text" name="batch_ref" id="batch_ref" class="form-control">
+                                        <input type="text" name="batch_ref" id="batch_ref" class="form-control" value="<?php echo refGenerate()?>">
                                         <div class="input-group-append">
                                             <button class="btn btn-default btn-ref-generate" ref-id="batch_ref">
                                                 <i class="fa fa-plus"></i>
@@ -26,7 +26,7 @@
                                 <div class="form-group">
                                     <label for="transaction_ref">Txn Reference Number</label>
                                     <div class="input-group">
-                                        <input type="text" name="transaction_ref" id="transaction_ref" class="form-control">
+                                        <input type="text" name="transaction_ref" id="transaction_ref" class="form-control" value="<?php echo refGenerate()?>">
                                         <div class="input-group-append">
                                             <button class="btn btn-default btn-ref-generate" ref-id="transaction_ref">
                                                 <i class="fa fa-plus"></i>
@@ -60,9 +60,13 @@
                                 <div class="form-group">
                                     <label for="department">Depart/Ministry</label>
                                     <select class="form-control" name="department" id="department">
-                                        <option>Mashruuca RCRF</option>
-                                        <option>SCORE Project</option>
-                                        <option>Wasaaradda Arrimaha</option>
+                                        <?php
+                                        foreach($departments as $department) {
+                                            ?>
+                                            <option value="<?php echo $department['id']?>"><?php echo $department['name']?></option>
+                                            <?php
+                                        }
+                                        ?>
                                     </select>
                                 </div>
                             </div>
@@ -71,7 +75,13 @@
                                 <div class="form-group">
                                     <label for="benef_bank">Beneficiary Bank</label>
                                     <select class="form-control" name="benef_bank" id="benef_bank">
-                                        <option>PBSMSOSM PREMIER</option>
+                                        <?php
+                                        foreach($participants as $participant) {
+                                            ?>
+                                            <option value="<?php echo $participant['bic_swift_code']?>"><?php echo $participant['participant_name']?></option>
+                                            <?php
+                                        }
+                                        ?>
                                     </select>
                                 </div>
                             </div>
@@ -91,7 +101,7 @@
                         <div class="row mt-4">
                             <div class="col-sm-12">
                                 <div class="modal-footer justify-content-between">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal" id="btn_discard">Discard</button>
+                                    <a type="button" class="btn btn-default" href="<?php echo base_url('dashboard')?>">Discard</a>
                                     <button type="button" class="btn btn-primary" id="btn_submit">Submit</button>
                                 </div>
                             </div>
@@ -149,8 +159,9 @@ $(document).on('click', '#btn_submit', function() {
             transaction_ref: $('#transaction_ref').val(),
             account_number: $('#account_number').val(),
             beneficiary_name: $('#beneficiary_name').val(),
-            department: $('#department').val(),
-            benef_bank: $('#benef_bank').val(),
+            department: $('#department option:selected').text(),
+            benef_bank: $('#benef_bank option:selected').text(),
+            bank_biccode: $('#benef_bank').val(),
             amount_pay: $('#amount_pay').val(),
         },
         success: function(resp) {

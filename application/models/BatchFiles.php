@@ -6,7 +6,7 @@ if (!defined('BASEPATH'))
 Class BatchFiles extends CI_Model
 {
 	public function add($data){
-		$query = "INSERT INTO batch_files(`file_name`, `batch_number`, `account`, `date`, `batch_amount`, `currency`, `total_records`, `status`, `upload_at`) VALUES('".$data['file_name']."', '".$data['batch_number']."', '".$data['account']."', '".$data['date']."', '".$data['batch_amount']."', '".$data['currency']."', '".$data['total_records']."', '".$data['status']."', 'NOW()')";
+		$query = "INSERT INTO batch_files(`file_name`, `batch_number`, `account`, `date`, `batch_amount`, `currency`, `total_records`, `status`, `upload_at`) VALUES('".$data['file_name']."', '".$data['batch_number']."', '".$data['account']."', '".$data['date']."', '".$data['batch_amount']."', '".$data['currency']."', '".$data['total_records']."', '".$data['status']."', NOW())";
         $this->db->query($query);
 
 		return $this->db->insert_id();
@@ -101,7 +101,7 @@ Class BatchFiles extends CI_Model
 	}
 
 	public function updateSubmitResult($data) {
-		$query = "UPDATE batch_files SET status='".$data['status']."', submit_at='NOW()'  WHERE id='".$data['id']."'";
+		$query = "UPDATE batch_files SET status='".$data['status']."', submit_at=NOW()  WHERE id='".$data['id']."'";
 
         return $this->db->query($query);
 	}

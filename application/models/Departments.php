@@ -18,4 +18,12 @@ Class Departments extends CI_Model
 		return $query_result;
 	}
 
+	public function existDepartment($name){
+		
+		$query = "SELECT * FROM departments WHERE name='".$name."'";
+
+		$query_result = $this->db->query($query)->result_array();
+		return count($query_result) > 0;
+	}
+
 }

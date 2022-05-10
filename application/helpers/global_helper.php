@@ -141,46 +141,80 @@ if(!function_exists('statusColor')){
 }
 
 if(!function_exists('apiBuilkUpload')){
-    function apiBuilkUpload($data){
+    function apiBuilkUpload($data){		
 		$curl = curl_init();
 
+		// $post_fields = '{
+		// 	"processType": "'.$data['process_type'].'",
+		// 	"BatchNumber":"'.$data['batch_number'].'",
+		// 	"NoOfPayment":"'.$data['no_of_payment'].'",
+		// 	"batchDate":'.$data['batch_date'].',
+		// 	"txnRef":"'.$data['txn_ref'].'",
+		// 	"txnCurr":"'.$data['txn_curr'].'",
+		// 	"settlementDate":'.$data['settlement_date'].',
+		// 	"ordCustAccount":'.$data['ord_cust_account'].',
+		// 	"ordCusName":"'.$data['ord_cust_name'].'",
+		// 	"txnPurpose":"'.$data['txn_purpose'].'",
+		// 	"benBankBIC":"'.$data['ben_bank_bic'].'",
+		// 	"benAccount":"'.$data['ben_account'].'",
+		// 	"benName": "'.$data['ben_name'].'",
+		// 	"benCrAmount":"'.$data['ben_cr_amount'].'",
+		// 	"batchInputter":"'.$data['batch_inputter'].'",
+		// 	"batchAuthoriser":"'.$data['batch_authoriser'].'",
+		// 	"processDate":'.$data['process_date'].',
+		// 	"processTime":'.$data['process_time'].'
+		// }';
+		$post_fields = json_encode(array(
+			"processType" => $data['process_type'],
+			"BatchNumber" => $data['batch_number'],
+			"NoOfPayment" => $data['no_of_payment'],
+			"batchDate" => $data['batch_date'],
+			"txnRef" => $data['txn_ref'],
+			"txnCurr" => $data['txn_curr'],
+			"settlementDate" => $data['settlement_date'],
+			"ordCustAccount" => $data['ord_cust_account'],
+			"ordCusName" => $data['ord_cust_name'],
+			"txnPurpose" => $data['txn_purpose'],
+			"benBankBIC" => $data['ben_bank_bic'],
+			"benAccount" => $data['ben_account'],
+			"benName" => $data['ben_name'],
+			"benCrAmount" => $data['ben_cr_amount'],
+			"batchInputter" => $data['batch_inputter'],
+			"batchAuthoriser" => $data['batch_authoriser'],
+			"processDate" => $data['process_date'],
+			"processTime" => $data['process_time']
+		));
+		$post_fields = str_replace('\"', '"', $post_fields);
+
 		curl_setopt_array($curl, array(
-			CURLOPT_URL => 'https://5.9.24.51:8889/jethro/indata/api/bulkpay',
+			CURLOPT_URL => 'https://5.9.24.51:8889/jethro/indata/',
 			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_SSL_VERIFYHOST=> false,
+			CURLOPT_SSL_VERIFYPEER => false,
 			CURLOPT_ENCODING => '',
 			CURLOPT_MAXREDIRS => 10,
 			CURLOPT_TIMEOUT => 0,
 			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST => 'POST',
-			CURLOPT_POSTFIELDS => array(
-				'processType' => $this->config->item('api_process_type'), 
-				'BatchNumber' => $data['batch_number'], 
-				'NoOfPayment' => $data['no_of_payment'],
-				'PaymentSeq' => $data['payment_seq'],
-				'batchDate' => $data['batch_date'],
-				'txnRef' => $data['txn_ref'],
-				'txnCurr' => $data['txn_curr'],
-				'settlementDate' => $data['settlement_date'],
-				'ordCustAccount' => $data['ord_cust_account'],
-				'benDepart' => $data['department'],
-				'txnPurpose' => $data['txn_purpose'],
-				'benBankBIC' => $data['ben_bank_bic'],
-				'benAccount' => $data['ben_account'],
-				'benName' => $data['ben_name'],
-				'benCrAmount' => $data['ben_cr_amount'],
-				'batchInputter' => $this->config->item('api_batch_inputter'),
-				'batchAuthoriser' => $this->config->item('api_batch_authoriser'),
-				'processDate' => $data['process_date'],
-				'processTime' => $data['process_time']
+			CURLOPT_POSTFIELDS =>$post_fields,
+			CURLOPT_HTTPHEADER => array(
+				'Authorization: Basic TlE4RDZRUzlMdnh4N3c0ZjM3REM6NHN1Qk5IaUNpeUtaN3dXc3Vpd3o=',
+				'Content-Type: text/plain',
+				'Cookie: JSESSIONID=F6D1AB7C27064B724868303B94CCB76D'
 			),
 		));
 
 		$response = curl_exec($curl);
+
+		writeLog('>>>>>>>>');
+		writeLog($post_fields);
+		writeLog($response);
 		writeLog(curl_error($curl));
+		writeLog('<<<<<<<<');
 
 		curl_close($curl);
-		
+
 		return json_decode($response, true);
 
 	}

@@ -157,26 +157,7 @@
 	<!-- ./wrapper -->
 
 	<script>
-	$(function () {
-
-	var table = $('#dataTable').DataTable({
-		"pagingType": 'full_numbers',
-		"paging": true,
-		"lengthChange": false,
-		"searching": false,
-		"ordering": true,
-		"info": true,
-		"autoWidth": false,
-		"responsive": true,
-	});
-
-	$('#dataTable tbody').on('click', 'tr', function () {
-		var data = table.row( this ).data();
-		//alert( 'You clicked on '+data[1]+'\'s row' );
-		location.href = 'pages/transaction.html?id=' + data[0];
-	});
-
-	});
+	
 	// DropzoneJS Demo Code End
 	</script>
 </body>

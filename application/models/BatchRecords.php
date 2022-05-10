@@ -24,5 +24,4 @@ Class BatchRecords extends CI_Model
 
         return $this->db->query($query);
 	}
-
 }

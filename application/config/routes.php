@@ -83,6 +83,7 @@ $route['api-ref-generate'] = 'APIController/refGenerate';
 // user urls
 $route['api-upload'] = 'DashboardController/apiUpload';
 $route['api-load-batch-files'] = 'DashboardController/apiLoadBatchFiles';
+$route['api-load-batch-records/(:any)'] = 'DashboardController/apiLoadBatchRecords/$1';
 $route['api-delete-batch-file'] = 'DashboardController/apiDeleteBatchFile';
 $route['api-submit-batch-file'] = 'DashboardController/apiSubmitBatchFile';
 $route['api-upload-manual'] = 'DashboardController/apiUploadManual';

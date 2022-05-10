@@ -40,6 +40,9 @@ class DashboardController extends CI_Controller {
 		$data['title'] = 'Manual Capture';
 		$data['sub_page'] = 'manual-capture';
 
+		$data['departments'] = $this->Departments->all();
+		$data['participants'] = $this->Participants->all();
+
 		$this->load->view('dashboard/basic', $data);
 	}
 
@@ -89,8 +92,8 @@ class DashboardController extends CI_Controller {
 		$data['sub_page'] = 'batch-file-view';
 
 		$data['batch_file'] = $this->BatchFiles->getByID($batch_file_id);
-		$data['records'] = $this->BatchRecords->loadByBatchFileID($batch_file_id);
-
+		$data['batch_file_id'] = $batch_file_id;
+		
 		$this->load->view('dashboard/basic', $data);
 	}
 
@@ -185,10 +188,17 @@ class DashboardController extends CI_Controller {
 			$batch_amount = '';
 			$currency = '';
 			$total_records = '';
-			$transaction_ref = 'BT202204058010';
 
 			$batch_file_id = null;
 
+			$batch_files_add_item = [];
+			$batch_records_add_list = [];
+
+			$bic_error = false;
+			$bic_missing_list = [];
+
+			$department_error = false;
+			$department_missing_list = [];
 			foreach($lines as $line) {
 
 				if($line_index == 0) {
@@ -206,7 +216,14 @@ class DashboardController extends CI_Controller {
 						return;
 					}
 
-					$batch_file_id = $this->BatchFiles->add(array(
+					if($total_records != count($lines) - 1) {
+						$this->output->set_status_header('400'); //Triggers the jQuery error callback
+						$this->output->set_content_type('application/json');
+						$this->output->set_output(json_encode(array('error' => 'Total records not same!'))); //Triggers the jQuery error callback
+						return;
+					}
+
+					$batch_files_add_item = array(
 						'file_name' => $_FILES['file']['name'],
 						'batch_number' => $batch_number,
 						'account' => $account,
@@ -215,13 +232,34 @@ class DashboardController extends CI_Controller {
 						'currency' => $currency,
 						'total_records' => $total_records,
 						'status' => '',
-					));
+					);
 					$line_index ++;
 					continue;
 				}
 
-				$batch_record_id = $this->BatchRecords->add(array(
-					'batch_file_id' => $batch_file_id,
+				$transaction_ref = refGenerate();
+
+				// check bic code
+				
+				if(!$this->Participants->existBicSwiftCode($line[6])) {
+					$bic_error = true;
+
+					if(!in_array($line[6], $bic_missing_list)) {
+						$bic_missing_list[] = $line[6];
+					}
+					
+				}
+
+				if(!$this->Departments->existDepartment($line[4])) {
+					$department_error = true;
+
+					if(!in_array($line[4], $department_missing_list)) {
+						$department_missing_list[] = $line[4];
+					}
+					
+				}
+
+				$batch_records_add_list[] = array(
 					'payment_seq' => $line_index,
 					'transaction_ref' => $transaction_ref,
 					'beneficiary_name' => $line[1],
@@ -231,21 +269,56 @@ class DashboardController extends CI_Controller {
 					'benef_bank' => $line[5],
 					'bank_biccode' => $line[6],
 					'status' => '', 
-				));
+				);
 
 				$line_index++;
 			}
 
+			$error_message = '';
+			if($bic_error) {
+				$error_message = 'BICCode is Missing!<br>'.implode(',', $bic_missing_list);
+			}
+
+			if($department_error) {
+				if($error_message == '') {
+					$error_message = 'Department is Missing!<br>'.implode(',', $department_missing_list);
+				}
+				else {
+					$error_message .= '<br>Department is Missing!<br>'.implode(',', $department_missing_list);
+				}
+				
+			}
+
+			if($error_message != '') {
+				$this->output->set_status_header('400'); //Triggers the jQuery error callback
+				$this->output->set_content_type('application/json');
+				$this->output->set_output(json_encode(array('error' => $error_message))); //Triggers the jQuery error callback
+				return;
+			}
+
+
+			$batch_file_id = $this->BatchFiles->add($batch_files_add_item);
+
+			foreach($batch_records_add_list as $batch_records_add_item) {
+				$new_batch_records_add_item = $batch_records_add_item;
+				$new_batch_records_add_item['batch_file_id'] = $batch_file_id;
+
+				$this->BatchRecords->add($new_batch_records_add_item);
+			}
+
 			echo json_encode(array(
-				'id' => $batch_file_id,
-				'batch_number' => $batch_number,
-				'account' => $account,
-				'date' => $date,
-				'batch_amount' => $batch_amount,
-				'currency' => $currency,
-				'total_records' => $total_records,
-				'status' => '', 
+				'success' => true
 			));
+			// echo json_encode(array(
+			// 	'id' => $batch_file_id,
+			// 	'batch_number' => $batch_number,
+			// 	'account' => $account,
+			// 	'date' => $date,
+			// 	'batch_amount' => $batch_amount,
+			// 	'currency' => $currency,
+			// 	'total_records' => $total_records,
+			// 	'status' => '', 
+			// ));
 		} else {
 			$this->output->set_status_header('400'); //Triggers the jQuery error callback
 			$this->output->set_content_type('application/json');
@@ -278,23 +351,28 @@ class DashboardController extends CI_Controller {
 
 			$batch_file_submit_error = false;
 			foreach($batch_records as $batch_record) {
+				$date = new DateTime();
 				$resp = apiBuilkUpload(array(
+					'process_type' => $this->config->item('api_process_type'),
 					'batch_number' => $batch_file['batch_number'],
 					'no_of_payment' => $batch_file['total_records'],
-					'payment_seq' => $batch_file['payment_seq'],
+					'payment_seq' => $batch_record['payment_seq'],
 					'batch_date' => $batch_file['date'],
 					'txn_ref' => $batch_record['transaction_ref'],
 					'txn_curr' => $batch_file['currency'],
-					'settlement_date' => '',
+					'settlement_date' => $date->format('Y').$date->format('m').$date->format('t'),
 					'ord_cust_account' => '',
+					'ord_cust_name' => '',
 					'department' => $batch_record['department'],
 					'txn_purpose' => '',
 					'ben_bank_bic' => $batch_record['bank_biccode'],
 					'ben_account' => $batch_record['account_number'],
 					'ben_name' => $batch_record['beneficiary_name'],
 					'ben_cr_amount' => $batch_record['amount_pay'],
-					'process_date' => '',
-					'process_time' => ''
+					'batch_inputter' => $this->config->item('api_batch_inputter'),
+					'batch_authoriser' => $this->config->item('api_batch_authoriser'),
+					'process_date' => $date->format('Y').$date->format('m').$date->format('t'),
+					'process_time' => $date->format('H').$date->format('i').$date->format('s')
 				));
 
 				if($resp['statusCode'] == '77') {
@@ -309,15 +387,19 @@ class DashboardController extends CI_Controller {
 				));
 			}
 
-			$this->BatchFile->updateSubmitResult(array(
+			$this->BatchFiles->updateSubmitResult(array(
 				'id' => $batch_file['id'],
-				'status' => $batch_file_submit_error ? 2 : 1,
+				'status' => $batch_file_submit_error ? 'Error' : 'Submitted',
 			));
 
 			$this->UserActivities->add(array(
 				'user_id' => $_SESSION['user_id'],
 				'ip' => getIP(),
 				'activity' => 'submit'
+			));
+
+			echo json_encode(array(
+				'success' => true,
 			));
 		}
 		else {
@@ -344,21 +426,49 @@ class DashboardController extends CI_Controller {
 				$batch_file['batch_amount'],
 				$batch_file['currency'],
 				$batch_file['total_records'],
-				'',
-				'<div class="btn-group btn-group-actions">
-				<button type="button" class="btn btn-default">Action</button>
-				<button type="button" class="btn btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown">
-				  <span class="sr-only">Toggle Dropdown</span>
-				</button>
-				<div class="dropdown-menu" role="menu">
-				  <span class="dropdown-item action-view" data-id="'.$batch_file['id'].'">View</span>
-				  <span class="dropdown-item action-delete" data-id="'.$batch_file['id'].'">Delete</span>
-				  <span class="dropdown-item action-submit" data-id="'.$batch_file['id'].'">Submit</span>
-				</div>
-			  </div>',
+				$batch_file['status'],
+				'<div class="btn-group-wrap d-flex align-items-center">
+					<div class="btn-group btn-group-actions">
+						<button type="button" class="btn btn-default">Action</button>
+						<button type="button" class="btn btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown">
+						<span class="sr-only">Toggle Dropdown</span>
+						</button>
+						<div class="dropdown-menu" role="menu">
+							<span class="dropdown-item action-view" data-id="'.$batch_file['id'].'">View</span>
+							<span class="dropdown-item action-delete" data-id="'.$batch_file['id'].'">Delete</span>
+							<span class="dropdown-item action-submit" data-id="'.$batch_file['id'].'">Submit</span>
+						</div>
+					</div>
+					<div class="actions-loading-wrap">
+						<div class="actions-loader"></div>
+					</div>
+				</div>',
 			);
 
 			$batch_file_index++;
+		}
+
+		echo json_encode($resp);
+	}
+
+	public function apiLoadBatchRecords($batch_file_id) {
+		$resp = array(
+			'data' => []
+		);
+
+		$batch_records = $this->BatchRecords->loadByBatchFileID($batch_file_id);
+		foreach($batch_records as $batch_record) {
+			$resp['data'][] = array(
+				$batch_record['transaction_ref'],
+				$batch_record['beneficiary_name'],
+				$batch_record['account_number'],
+				$batch_record['amount_pay'],
+				$batch_record['department'],
+				$batch_record['benef_bank'],
+				$batch_record['bank_biccode'],
+				$batch_record['resp_rcvStatus']
+			);
+
 		}
 
 		echo json_encode($resp);
@@ -438,7 +548,7 @@ class DashboardController extends CI_Controller {
 				$batch_file['batch_amount'],
 				$batch_file['currency'],
 				$batch_file['total_records'],
-				"<span class='text-uppercase'>".$batch_file['status']."</span>",
+				$batch_file['status'],
 				$batch_file['id'],
 			);
 
@@ -455,6 +565,7 @@ class DashboardController extends CI_Controller {
 		$beneficiary_name = isset($_POST['beneficiary_name']) ? $_POST['beneficiary_name'] : '';
 		$department = isset($_POST['department']) ? $_POST['department'] : '';
 		$benef_bank = isset($_POST['benef_bank']) ? $_POST['benef_bank'] : '';
+		$bank_biccode = isset($_POST['bank_biccode']) ? $_POST['bank_biccode'] : '';
 		$amount_pay = isset($_POST['amount_pay']) ? $_POST['amount_pay'] : '';
 
 		if($batch_ref == '') {
@@ -475,7 +586,7 @@ class DashboardController extends CI_Controller {
 			'amount_pay' => $amount_pay,
 			'department' => $department,
 			'benef_bank' => $benef_bank,
-			'bank_biccode' => '',
+			'bank_biccode' => $bank_biccode,
 			'status' => '1', 
 		));
 

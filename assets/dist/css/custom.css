@@ -38,3 +38,26 @@
 .btn-group-actions .dropdown-item {
   cursor: pointer;
 }
+
+.actions-loader {
+  border: 5px solid #ffffff;
+  border-top: 5px solid #28a745;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.actions-loading-wrap {
+  margin-left: 10px;
+  display: none;
+}
+
+.btn-group-wrap.loading .actions-loading-wrap {
+  display: block;
+}
