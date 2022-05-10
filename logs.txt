@@ -1,0 +1,30 @@
+22-05-9 03:32:52       test
+22-05-9 03:33:02       test
+22-05-9 03:35:52       sendMail fail
+22-05-9 03:35:52       You must provide at least one recipient email address.
+22-05-9 03:36:24       sendMail fail
+22-05-9 03:36:24       You must provide at least one recipient email address.
+22-05-9 03:39:16       sendMail fail
+22-05-9 03:39:16       You must provide at least one recipient email address.
+22-05-9 03:44:49       sendMail fail
+22-05-9 03:44:49       You must provide at least one recipient email address.
+22-05-9 03:45:15       sendMail fail
+22-05-9 03:45:15       You must provide at least one recipient email address.
+22-05-9 03:45:33       sendMail fail
+22-05-9 03:45:33       You must provide at least one recipient email address.
+22-05-9 04:31:10       sendMail fail
+22-05-9 04:31:10       SMTP Error: The following recipients failed: jaygangkun@hotmail.com: "Your IP: 204.44.96.131 : Your domain  is not allowed in header From"
+
+22-05-9 04:32:14       sendMail success
+22-05-9 04:33:24       sendMail success
+22-05-9 05:00:40       sendMail success
+22-05-9 05:03:18       sendMail success
+22-05-9 05:05:30       sendMail success
+22-05-9 05:13:55       sendMail success
+22-05-9 05:22:22       sendMail success
+22-05-9 05:24:13       sendMail success
+22-05-9 05:31:25       sendMail success
+22-05-10 04:52:09       sendMail fail
+22-05-10 04:52:09       You must provide at least one recipient email address.
+22-05-10 04:52:35       sendMail fail
+22-05-10 04:52:35       You must provide at least one recipient email address.
