@@ -59,10 +59,11 @@ class APIController extends CI_Controller {
 
         $txnReferences = $_POST['txnReferences'];
         foreach($txnReferences as $txnReference) {
-            // $this->BatchRecords->updateApiResult(array(
-            //     'batch_number' => $_POST['BatchNumber'],
-            //     'status' => $_POST['statusCode'] == '77' ? 2 : 1,
-            // ));
+            $this->BatchRecords->updateApiResult(array(
+                'transaction_ref' => $txnReference['txnRef'],
+                'resp_rcvStatus' => $txnReference['procStatus'],
+                'resp_errorMsg' => $txnReference['errorMsg']
+            ));
         }
     }
 }

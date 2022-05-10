@@ -24,4 +24,10 @@ Class BatchRecords extends CI_Model
 
         return $this->db->query($query);
 	}
+
+	public function updateApiResultByTxn($data) {
+		$query = "UPDATE batch_records SET resp_rcvStatus='".$data['resp_rcvStatus']."', resp_errorMsg='".$data['resp_errorMsg']."' WHERE transaction_ref='".$data['transaction_ref']."'";
+
+        return $this->db->query($query);
+	}
 }
