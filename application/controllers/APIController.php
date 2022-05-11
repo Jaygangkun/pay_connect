@@ -16,7 +16,10 @@ class APIController extends CI_Controller {
     }
 
     public function payUpdate() {
-        if(isset($_POST['BatchNumber'])) {
+        
+        $body_data = json_decode(file_get_contents('php://input'), true);
+
+        if(!isset($body_data['BatchNumber'])) {
             echo json_encode(array(
                 'success' => false,
                 'message' => 'BatchNumber empty'
@@ -25,7 +28,7 @@ class APIController extends CI_Controller {
             return;
         }
 
-        if(isset($_POST['BatchStatus'])) {
+        if(!isset($body_data['BatchStatus'])) {
             echo json_encode(array(
                 'success' => false,
                 'message' => 'BatchStatus empty'
@@ -34,7 +37,7 @@ class APIController extends CI_Controller {
             return;
         }
 
-        if(isset($_POST['statusCode'])) {
+        if(!isset($body_data['statusCode'])) {
             echo json_encode(array(
                 'success' => false,
                 'message' => 'statusCode empty'
@@ -43,7 +46,7 @@ class APIController extends CI_Controller {
             return;
         }
 
-        if(isset($_POST['txnReferences'])) {
+        if(!isset($body_data['txnReferences'])) {
             echo json_encode(array(
                 'success' => false,
                 'message' => 'txnReferences empty'
@@ -53,11 +56,11 @@ class APIController extends CI_Controller {
         }
 
         $this->BatchFiles->updateApiResult(array(
-            'batch_number' => $_POST['BatchNumber'],
-            'status' => $_POST['statusCode'] == '77' ? 2 : 1,
+            'batch_number' => $body_data['BatchNumber'],
+            'status' => $body_data['statusCode'] == '77' ? 2 : 1,
         ));
 
-        $txnReferences = $_POST['txnReferences'];
+        $txnReferences = $body_data['txnReferences'];
         foreach($txnReferences as $txnReference) {
             $this->BatchRecords->updateApiResult(array(
                 'transaction_ref' => $txnReference['txnRef'],
@@ -65,5 +68,9 @@ class APIController extends CI_Controller {
                 'resp_errorMsg' => $txnReference['errorMsg']
             ));
         }
+
+        echo json_encode(array(
+            'success' => true
+        ));
     }
 }
