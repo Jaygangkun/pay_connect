@@ -60,7 +60,6 @@ $route['recovery-password'] = 'PageController/recoveryPassword';
 
 $route['reset-password/(:any)'] = 'PageController/resetPassword/$1';
 $route['dashboard'] = 'PageController/dashboard';
-$route['verify/(:any)'] = 'PageController/verify/$1';
 
 // user pages
 $route['file-upload'] = 'DashboardController/pageFileUpload';
@@ -86,6 +85,7 @@ $route['api-load-batch-files'] = 'DashboardController/apiLoadBatchFiles';
 $route['api-load-batch-records/(:any)'] = 'DashboardController/apiLoadBatchRecords/$1';
 $route['api-delete-batch-file'] = 'DashboardController/apiDeleteBatchFile';
 $route['api-submit-batch-file'] = 'DashboardController/apiSubmitBatchFile';
+$route['api-authorise-batch-file'] = 'DashboardController/apiAuthoriseBatchFile';
 $route['api-upload-manual'] = 'DashboardController/apiUploadManual';
 $route['api-load-batch-files-submitted'] = 'DashboardController/apiLoadBatchFilesSubmitted';
 $route['api-load-payment-activities'] = 'DashboardController/apiLoadPaymentActivities';

@@ -14,7 +14,7 @@ Class Users extends CI_Model
 	}
 
 	public function all(){
-		$query = "SELECT * FROM users JOIN departments ON departments.id=users.department_id";
+		$query = "SELECT users.*, departments.name FROM users JOIN departments ON departments.id=users.department_id";
 		$query_result = $this->db->query($query)->result_array();
 		
 		return $query_result;

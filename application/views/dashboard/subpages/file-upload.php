@@ -166,44 +166,23 @@
 	});
   
   $(document).on('click', '.action-submit', function() {
-    var btn_group_wrap = $(this).parents('.btn-group-wrap');
-    $(btn_group_wrap).addClass('loading');
-    $(btn_group_wrap).find('.btn').addClass('disabled');
-    
-    $.ajax({
-      url: base_url + 'api-submit-batch-file',
-      type: 'post',
-      dataType: 'json',
-      data: {
-        id: $(this).attr('data-id')
-      },
-      success: function(resp) {
-        $(btn_group_wrap).removeClass('loading');
-        $(btn_group_wrap).find('.btn').removeClass('disabled');
-        if(resp.success) {
-          table_batch_files.ajax.reload();
-        }
-        else {
-          alert(resp.message);
-        }
-      }
-    })
-  })
-
-  $(document).on('click', '.action-view', function() {
-    location.href = base_url + 'batch-file-view/' + $(this).attr('data-id');
-  })
-
-  $(document).on('click', '.action-delete', function() {
-    if(confirm('Are you sure to delete?')) {
+    <?php
+    if(ableUpload($_SESSION['user']['role'])) {
+      ?>
+      var btn_group_wrap = $(this).parents('.btn-group-wrap');
+      $(btn_group_wrap).addClass('loading');
+      $(btn_group_wrap).find('.btn').addClass('disabled');
+      
       $.ajax({
-        url: base_url + "api-delete-batch-file",
+        url: base_url + 'api-submit-batch-file',
         type: 'post',
         dataType: 'json',
         data: {
           id: $(this).attr('data-id')
         },
         success: function(resp) {
+          $(btn_group_wrap).removeClass('loading');
+          $(btn_group_wrap).find('.btn').removeClass('disabled');
           if(resp.success) {
             table_batch_files.ajax.reload();
           }
@@ -212,6 +191,80 @@
           }
         }
       })
+      <?php
+    }
+    else {
+      ?>
+      alert('No Sufficient Privilege to Submit Batch')
+      <?php
+    }
+    ?>
+    
+  })
+
+  $(document).on('click', '.action-authorise', function() {
+    <?php
+    if(ableAuthorise($_SESSION['user']['role'])) {
+      ?>
+      var btn_group_wrap = $(this).parents('.btn-group-wrap');
+      $(btn_group_wrap).addClass('loading');
+      $(btn_group_wrap).find('.btn').addClass('disabled');
+      $.ajax({
+        url: base_url + 'api-authorise-batch-file',
+        type: 'post',
+        dataType: 'json',
+        data: {
+          id: $(this).attr('data-id')
+        },
+        success: function(resp) {
+          $(btn_group_wrap).removeClass('loading');
+          $(btn_group_wrap).find('.btn').removeClass('disabled');
+          if(resp.success) {
+            table_batch_files.ajax.reload();
+          }
+          else {
+            alert(resp.message);
+          }
+        }
+      })
+      <?php
+    }
+    else {
+      ?>
+      alert('No Allowed to Authorise Batch')
+      <?php
+    }
+    ?>
+  })
+
+  $(document).on('click', '.action-view', function() {
+    location.href = base_url + 'batch-file-view/' + $(this).attr('data-id');
+  })
+
+  $(document).on('click', '.action-delete', function() {
+    var status = $(this).attr('data-status');
+    if(status.toLowerCase() == 'submitted') {
+      alert('Cannot delete Submitted Batch');
+    }
+    else {
+      if(confirm('Are you sure to delete?')) {
+        $.ajax({
+          url: base_url + "api-delete-batch-file",
+          type: 'post',
+          dataType: 'json',
+          data: {
+            id: $(this).attr('data-id')
+          },
+          success: function(resp) {
+            if(resp.success) {
+              table_batch_files.ajax.reload();
+            }
+            else {
+              alert(resp.message);
+            }
+          }
+        })
+      }
     }
   })
 </script>

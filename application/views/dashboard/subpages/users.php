@@ -221,7 +221,7 @@ $(document).on('click', '.btn-activate', function() {
     dataType: 'json',
     data: {
       user_id: $(this).attr('user-id'),
-      status: 51
+      status: 'active'
     },
     success: function(resp) {
       if(resp.success) {
@@ -241,7 +241,7 @@ $(document).on('click', '.btn-deactivate', function() {
     dataType: 'json',
     data: {
       user_id: $(this).attr('user-id'),
-      status: 50
+      status: 'deactive'
     },
     success: function(resp) {
       if(resp.success) {

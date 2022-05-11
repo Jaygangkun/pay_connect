@@ -20,7 +20,7 @@ class DashboardController extends CI_Controller {
 	}
 
 	public function pageFileUpload(){
-		if(!isset($_SESSION['user_id']) || !isset($_SESSION['role'])){
+		if(!isset($_SESSION['user'])){
 			redirect(base_url('/login'));
 		}
 
@@ -32,7 +32,7 @@ class DashboardController extends CI_Controller {
 	}
 
 	public function pageManualCapture(){
-		if(!isset($_SESSION['user_id']) || !isset($_SESSION['role'])){
+		if(!isset($_SESSION['user'])){
 			redirect(base_url('/login'));
 		}
 
@@ -47,7 +47,7 @@ class DashboardController extends CI_Controller {
 	}
 
 	public function pageSchedulePayments(){
-		if(!isset($_SESSION['user_id']) || !isset($_SESSION['role'])){
+		if(!isset($_SESSION['user'])){
 			redirect(base_url('/login'));
 		}
 
@@ -59,7 +59,7 @@ class DashboardController extends CI_Controller {
 	}
 
 	public function pagePaymentActivity(){
-		if(!isset($_SESSION['user_id']) || !isset($_SESSION['role'])){
+		if(!isset($_SESSION['user'])){
 			redirect(base_url('/login'));
 		}
 
@@ -71,7 +71,7 @@ class DashboardController extends CI_Controller {
 	}
 
 	public function pageParticipants(){
-		if(!isset($_SESSION['user_id']) || !isset($_SESSION['role'])){
+		if(!isset($_SESSION['user'])){
 			redirect(base_url('/login'));
 		}
 
@@ -83,7 +83,7 @@ class DashboardController extends CI_Controller {
 	}
 
 	public function pageBatchFileView($batch_file_id){
-		if(!isset($_SESSION['user_id']) || !isset($_SESSION['role'])){
+		if(!isset($_SESSION['user'])){
 			redirect(base_url('/login'));
 		}
 
@@ -98,7 +98,7 @@ class DashboardController extends CI_Controller {
 	}
 
 	public function pageTransactions(){
-		if(!isset($_SESSION['user_id']) || !isset($_SESSION['role'])){
+		if(!isset($_SESSION['user'])){
 			redirect(base_url('/login'));
 		}
 
@@ -110,7 +110,7 @@ class DashboardController extends CI_Controller {
 	}
 
 	public function pageEmailServer(){
-		if(!isset($_SESSION['user_id']) || !isset($_SESSION['role'])){
+		if(!isset($_SESSION['user'])){
 			redirect(base_url('/login'));
 		}
 
@@ -122,7 +122,7 @@ class DashboardController extends CI_Controller {
 	}
 
 	public function pageAPIGateways(){
-		if(!isset($_SESSION['user_id']) || !isset($_SESSION['role'])){
+		if(!isset($_SESSION['user'])){
 			redirect(base_url('/login'));
 		}
 
@@ -134,7 +134,7 @@ class DashboardController extends CI_Controller {
 	}
 
 	public function pageUsers(){
-		if(!isset($_SESSION['user_id']) || !isset($_SESSION['role'])){
+		if(!isset($_SESSION['user'])){
 			redirect(base_url('/login'));
 		}
 		
@@ -148,8 +148,7 @@ class DashboardController extends CI_Controller {
 	}
 
 	public function pageUserActivities(){
-
-		if(!isset($_SESSION['user_id']) || !isset($_SESSION['role'])){
+		if(!isset($_SESSION['user'])){
 			redirect(base_url('/login'));
 		}
 
@@ -387,15 +386,41 @@ class DashboardController extends CI_Controller {
 				));
 			}
 
-			$this->BatchFiles->updateSubmitResult(array(
-				'id' => $batch_file['id'],
-				'status' => $batch_file_submit_error ? 'Error' : 'Submitted',
-			));
+			// $this->BatchFiles->updateSubmitResult(array(
+			// 	'id' => $batch_file['id'],
+			// 	'status' => $batch_file_submit_error ? 'Error' : 'Submitted',
+			// ));
+
+			$this->BatchFiles->updateStatus($id, 'SUBMITTED');
 
 			$this->UserActivities->add(array(
-				'user_id' => $_SESSION['user_id'],
+				'user_id' => $_SESSION['user']['id'],
 				'ip' => getIP(),
 				'activity' => 'submit'
+			));
+
+			echo json_encode(array(
+				'success' => true,
+			));
+		}
+		else {
+			echo json_encode(array(
+				'success' => false,
+				'message' => 'Batch file ID empty'
+			));
+		}
+	}
+
+	public function apiAuthoriseBatchFile() {
+		$id = isset($_POST['id']) ? $_POST['id'] : null;
+		if($id) {
+			$this->BatchFiles->updateStatus($id, 'AUTHORISED');
+			$this->BatchRecords->updateStatusByBatchFile($id, 'AUTHORISED');
+
+			$this->UserActivities->add(array(
+				'user_id' => $_SESSION['user']['id'],
+				'ip' => getIP(),
+				'activity' => 'authorise'
 			));
 
 			echo json_encode(array(
@@ -426,7 +451,7 @@ class DashboardController extends CI_Controller {
 				$batch_file['batch_amount'],
 				$batch_file['currency'],
 				$batch_file['total_records'],
-				$batch_file['status'],
+				'<span class="text-capitalize">'.$batch_file['status']."</span>",
 				'<div class="btn-group-wrap d-flex align-items-center">
 					<div class="btn-group btn-group-actions">
 						<button type="button" class="btn btn-default">Action</button>
@@ -435,7 +460,8 @@ class DashboardController extends CI_Controller {
 						</button>
 						<div class="dropdown-menu" role="menu">
 							<span class="dropdown-item action-view" data-id="'.$batch_file['id'].'">View</span>
-							<span class="dropdown-item action-delete" data-id="'.$batch_file['id'].'">Delete</span>
+							<span class="dropdown-item action-delete" data-id="'.$batch_file['id'].'" data-status="'.$batch_file['status'].'">Delete</span>
+							<span class="dropdown-item action-authorise" data-id="'.$batch_file['id'].'">Authorise</span>
 							<span class="dropdown-item action-submit" data-id="'.$batch_file['id'].'">Submit</span>
 						</div>
 					</div>
@@ -490,28 +516,24 @@ class DashboardController extends CI_Controller {
 				$batch_file['batch_amount'],
 				$batch_file['currency'],
 				$batch_file['total_records'],
-				'<span class="text-uppercase">'.$batch_file['status'].'</span>',
-				$batch_file['status'] == '1' ?
-				'<div class="btn-group btn-group-actions">
-					<button type="button" class="btn btn-default">Action</button>
-					<button type="button" class="btn btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown">
-					<span class="sr-only">Toggle Dropdown</span>
-					</button>
-					<div class="dropdown-menu" role="menu">
-					<span class="dropdown-item action-view" data-id="'.$batch_file['id'].'">View</span>
-					<span class="dropdown-item action-authorise" data-id="'.$batch_file['id'].'">Authorise</span>
-					<span class="dropdown-item action-resubmit" data-id="'.$batch_file['id'].'">Resubmit</span>
+				'<span class="text-capitalize">'.$batch_file['status']."</span>",
+				'<div class="btn-group-wrap d-flex align-items-center">
+					<div class="btn-group btn-group-actions">
+						<button type="button" class="btn btn-default">Action</button>
+						<button type="button" class="btn btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown">
+						<span class="sr-only">Toggle Dropdown</span>
+						</button>
+						<div class="dropdown-menu" role="menu">
+							<span class="dropdown-item action-view" data-id="'.$batch_file['id'].'">View</span>
+							<span class="dropdown-item action-delete" data-id="'.$batch_file['id'].'" data-status="'.$batch_file['status'].'">Delete</span>
+							<span class="dropdown-item action-authorise" data-id="'.$batch_file['id'].'">Authorise</span>
+							<span class="dropdown-item action-resubmit" data-id="'.$batch_file['id'].'">Resubmit</span>
+						</div>
 					</div>
-				</div>' : 
-				'<div class="btn-group btn-group-actions">
-					<button type="button" class="btn btn-default">Action</button>
-					<button type="button" class="btn btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown">
-					<span class="sr-only">Toggle Dropdown</span>
-					</button>
-					<div class="dropdown-menu" role="menu">
-					<span class="dropdown-item action-view" data-id="'.$batch_file['id'].'">View</span>
+					<div class="actions-loading-wrap">
+						<div class="actions-loader"></div>
 					</div>
-				</div>',
+				</div>'
 			);
 
 			$batch_file_index++;
@@ -577,9 +599,11 @@ class DashboardController extends CI_Controller {
 		}
 
 		$batch_file_id = $this->BatchFiles->addRefID($batch_ref);
+		$payment_seq = count($this->BatchRecords->loadByBatchFileID($batch_file_id)) + 1;
 
 		$this->BatchRecords->add(array(
 			'batch_file_id' => $batch_file_id,
+			'payment_seq' => $payment_seq,
 			'transaction_ref' => $transaction_ref,
 			'beneficiary_name' => $beneficiary_name,
 			'account_number' => $account_number,
@@ -588,6 +612,15 @@ class DashboardController extends CI_Controller {
 			'benef_bank' => $benef_bank,
 			'bank_biccode' => $bank_biccode,
 			'status' => '1', 
+		));
+
+		$date = new DateTime();
+		$this->BatchFiles->manualSubmit(array(
+			'id' => $batch_file_id,
+			'batch_amount' => $amount_pay == '' ? 0 : $amount_pay,
+			'currency' => 'USD',
+			'total_records' => $payment_seq,
+			'date' => $date->format('m')."/".$date->format('t')."/".$date->format('Y')
 		));
 
 		echo json_encode(array(
@@ -825,7 +858,7 @@ class DashboardController extends CI_Controller {
 			foreach($roles as $role) {
 				$role_html .= '<span class="badge badge-success text-uppercase mr-1">'.roleName($role).'</span>';
 			}
-
+			
 			$resp['data'][] = array(
 				$user_index,
 				$user['user_name'],
@@ -833,7 +866,7 @@ class DashboardController extends CI_Controller {
 				$user['email'],
 				$user['name'],
 				$role_html,
-				$user['status'] == 51 ? 
+				strtolower($user['status']) == 'active' ? 
 				"<span class='btn btn-danger btn-deactivate' user-id='".$user['id']."'>Deactivate</span>"
 				:
 				"<span class='btn btn-success btn-activate' user-id='".$user['id']."'>Activate</span>",
@@ -854,6 +887,15 @@ class DashboardController extends CI_Controller {
 			));
 			return;
 		}
+
+		if($this->Users->existEmail(isset($_POST['email']) ? $_POST['email'] : '')) {
+			echo json_encode(array(
+				'success' => false,
+				'message' => 'same email already exist!',
+			));
+			return;
+		}
+		
 		
 		$this->Users->add(array(
 			'user_name' => isset($_POST['user_name']) ? $_POST['user_name'] : '',
@@ -954,7 +996,7 @@ class DashboardController extends CI_Controller {
 	
 			$this->Users->updateLoginStatus($_POST['user_id'], 0);
 
-			unset($_SESSION['user_id']);
+			unset($_SESSION['user']);
 			
 			echo json_encode(array(
 				'success' => false

@@ -21,7 +21,7 @@ Class BatchFiles extends CI_Model
 			return $query_result[0]['id'];
 		}
 		
-		$query = "INSERT INTO batch_files(`ref_id`) VALUES('".$ref_id."')";
+		$query = "INSERT INTO batch_files(`ref_id`, `batch_amount`, `status`, `submit_at`) VALUES('".$ref_id."', '0', 'SUBMITTED', NOW())";
         $this->db->query($query);
 
 		return $this->db->insert_id();
@@ -55,7 +55,7 @@ Class BatchFiles extends CI_Model
 	}
 
 	public function allScheduled(){
-		$query = "SELECT * FROM batch_files WHERE status='1' OR status='4'";
+		$query = "SELECT * FROM batch_files WHERE LOWER(status)='submitted'";
 		return $this->db->query($query)->result_array();
 	}
 
@@ -108,6 +108,18 @@ Class BatchFiles extends CI_Model
 
 	public function updateApiResult($data) {
 		$query = "UPDATE batch_files SET status='".$data['status']."' WHERE batch_number='".$data['batch_number']."'";
+
+        return $this->db->query($query);
+	}
+
+	public function updateStatus($id, $status) {
+		$query = "UPDATE batch_files SET status='".$status."', authorise_at=NOW()  WHERE id='".$id."'";
+
+        return $this->db->query($query);
+	}
+
+	public function manualSubmit($data) {
+		$query = "UPDATE batch_files SET batch_amount= cast(batch_amount AS DECIMAL(10, 2)) + cast('".$data['batch_amount']."' AS DECIMAL(10, 2)), currency='".$data['currency']."', total_records='".$data['total_records']."', status='SUBMITTED', `date`='".$data['date']."' WHERE id='".$data['id']."'";
 
         return $this->db->query($query);
 	}

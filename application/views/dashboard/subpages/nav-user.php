@@ -7,12 +7,18 @@
             <p>Dashboard</p>
         </a>
     </li>
-    <li class="nav-item">
-        <a href="<?= base_url('/file-upload') ?>" class="nav-link <?php echo isset($sub_page) && $sub_page == 'file-upload' ? 'active' : '' ?>">
-            <i class="nav-icon fas fa-upload"></i>
-            <p>File Upload</p>
-        </a>
-    </li>
+    <?php
+    if(ableUpload($_SESSION['user']['role'])) {
+        ?>
+        <li class="nav-item">
+            <a href="<?= base_url('/file-upload') ?>" class="nav-link <?php echo isset($sub_page) && $sub_page == 'file-upload' ? 'active' : '' ?>">
+                <i class="nav-icon fas fa-upload"></i>
+                <p>File Upload</p>
+            </a>
+        </li>
+        <?php
+    }
+    ?>
 
     <li class="nav-item">
         <a href="<?= base_url('/manual-capture') ?>" class="nav-link <?php echo isset($sub_page) && $sub_page == 'manual-capture' ? 'active' : '' ?>">

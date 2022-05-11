@@ -92,7 +92,7 @@
 				<!-- Notifications Dropdown Menu -->
 				<li class="nav-item dropdown">
 				<a class="nav-link" data-toggle="dropdown" href="#">
-					<?php echo isset($_SESSION['full_name']) ? $_SESSION['full_name'] : ''?> &nbsp;&nbsp;
+					<?php echo isset($_SESSION['user']) ? $_SESSION['user']['full_name'] : ''?> &nbsp;&nbsp;
 					<i class="fas fa-user"></i>
 				</a>
 				<div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
@@ -116,7 +116,7 @@
 				<!-- Sidebar Menu -->
 				<nav class="mt-2">
 				<?php 
-				if(isset($_SESSION['role']) && $_SESSION['role'] == 1){
+				if(isset($_SESSION['user']) && $_SESSION['user']['role'] == 1){
 					include('subpages/nav-admin.php');
 				}
 				else{
@@ -168,7 +168,7 @@
 					type: 'post',
 					dataType: 'json',
 					data: {
-						user_id: <?php echo $_SESSION['user_id']?>
+						user_id: <?php echo $_SESSION['user']['id']?>
 					},
 					success: function(resp) {
 						if(!resp.success) {
@@ -179,7 +179,7 @@
 			}
 			function resetTimer() {
 				clearTimeout(time);
-				time = setTimeout(logout, 1000 * 60 * 5); // 5mins
+				// time = setTimeout(logout, 1000 * 60 * 5); // 5mins
 			}
 		};
 		inactivityTime();

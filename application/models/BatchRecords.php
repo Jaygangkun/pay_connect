@@ -30,4 +30,10 @@ Class BatchRecords extends CI_Model
 
         return $this->db->query($query);
 	}
+
+	public function updateStatusByBatchFile($batch_file_id, $status) {
+		$query = "UPDATE batch_records SET resp_rcvStatus='".$status."' WHERE batch_file_id='".$batch_file_id."'";
+
+        return $this->db->query($query);
+	}
 }

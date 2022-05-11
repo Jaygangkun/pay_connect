@@ -15,7 +15,7 @@ class PageController extends CI_Controller {
 	}
 
 	public function index(){
-		if(!isset($_SESSION['user_id'])){
+		if(!isset($_SESSION['user'])){
 			redirect('/login');
 		}
 		else{
@@ -51,7 +51,12 @@ class PageController extends CI_Controller {
 			}
 
 			if($result['login_status'] == 1) {
-				$this->session->set_flashdata('warning', 'User already login now!');
+				// $this->session->set_flashdata('warning', 'User already login now!');
+				// redirect(base_url('/login'), 'refresh');
+			}
+
+			if($result['status'] == 'deactive') {
+				$this->session->set_flashdata('warning', 'User is deactive now!');
 				redirect(base_url('/login'), 'refresh');
 			}
 
@@ -63,9 +68,7 @@ class PageController extends CI_Controller {
 				'activity' => 'login'
 			));
 
-			$_SESSION['user_id'] = $result['id'];
-			$_SESSION['role'] = $result['role'];
-			$_SESSION['full_name'] = $result['full_name'];
+			$_SESSION['user'] = $result;
 
 			redirect(base_url('/dashboard'), 'refresh');
 
@@ -107,24 +110,24 @@ class PageController extends CI_Controller {
 			// }
 		}
 		else{
-			unset($_SESSION['user_id']);
+			unset($_SESSION['user']);
 			$this->load->view('auth/login');
 		}
 	}
 
 	public function logout() {
-		if(isset($_SESSION['user_id'])) {
+		if(isset($_SESSION['user'])) {
 			$this->UserActivities->add(array(
-				'user_id' => $_SESSION['user_id'],
+				'user_id' => $_SESSION['user']['id'],
 				'ip' => getIP(),
 				'activity' => 'logout'
 			));
 	
-			$this->Users->updateLoginStatus($_SESSION['user_id'], 0);
+			$this->Users->updateLoginStatus($_SESSION['user']['id'], 0);
 		}
 		
 
-		unset($_SESSION['user_id']);
+		unset($_SESSION['user']);
 		$this->load->view('auth/login');
 	}
 
@@ -232,7 +235,7 @@ class PageController extends CI_Controller {
 	}
 
 	public function dashboard(){
-		if(!isset($_SESSION['user_id']) || !isset($_SESSION['role'])){
+		if(!isset($_SESSION['user'])){
 			redirect(base_url('/login'));
 		}
 
@@ -241,7 +244,7 @@ class PageController extends CI_Controller {
 		$data['title'] = 'Dashboard';
 		$data['sub_page'] = 'dashboard';
 
-		if($_SESSION['role'] == 1) {
+		if($_SESSION['user']['role'] == 1) {
 			// Admin
 			$data['batch_files'] = array(
 				'processed' => count($this->BatchFiles->allByStatus('processed')),

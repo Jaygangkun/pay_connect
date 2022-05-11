@@ -77,6 +77,45 @@ if(!function_exists('roleName')){
 	}
 }
 
+if(!function_exists('ableAuthorise')){
+    function ableAuthorise($role){
+		$roles = explode(',', $role);
+		foreach($roles as $role) {
+			if($role == 4) { //uploader
+				return false;
+			}
+		}
+
+		return true;
+	}
+}
+
+if(!function_exists('ableSubmit')){
+    function ableSubmit($role){
+		$roles = explode(',', $role);
+		foreach($roles as $role) {
+			if($role == 4) { // uploader
+				return false;
+			}
+		}
+
+		return true;
+	}
+}
+
+if(!function_exists('ableUpload')){
+    function ableUpload($role){
+		$roles = explode(',', $role);
+		foreach($roles as $role) {
+			if($role == 3) { // authoriser
+				return false;
+			}
+		}
+
+		return true;
+	}
+}
+
 if(!function_exists('activityCode')){
     function activityCode($name){
 		switch(strtolower($name)) {
@@ -219,4 +258,5 @@ if(!function_exists('apiBuilkUpload')){
 
 	}
 }
+
 ?>

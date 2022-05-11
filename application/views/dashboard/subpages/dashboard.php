@@ -58,7 +58,7 @@
 	<div class="container-fluid">
 		<!-- Small boxes (Stat box) -->
 		<?php
-		if($_SESSION['role'] == 1) {
+		if($_SESSION['user']['role'] == 1) {
 			// Admin
 			?>
 				<div class="row">
