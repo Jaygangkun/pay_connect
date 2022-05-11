@@ -55,18 +55,41 @@ class APIController extends CI_Controller {
             return;
         }
 
+        if(!$this->BatchFiles->existBatchNumber($body_data['BatchNumber'])) {
+            echo json_encode(array(
+                'success' => false,
+                'message' => "Invalid batch number or transaction ref"
+            ));
+            return;    
+        }
         $this->BatchFiles->updateApiResult(array(
             'batch_number' => $body_data['BatchNumber'],
             'status' => $body_data['statusCode'] == '77' ? 2 : 1,
         ));
 
+        $resp_transactions_missing = [];
         $txnReferences = $body_data['txnReferences'];
         foreach($txnReferences as $txnReference) {
-            $this->BatchRecords->updateApiResult(array(
-                'transaction_ref' => $txnReference['txnRef'],
-                'resp_rcvStatus' => $txnReference['procStatus'],
-                'resp_errorMsg' => $txnReference['errorMsg']
+
+            if($this->BatchRecords->existTransactionRef($txnReference['txnRef'])) {
+                $this->BatchRecords->updateApiBulkResult(array(
+                    'transaction_ref' => $txnReference['txnRef'],
+                    'resp_rcvStatus' => $txnReference['procStatus'],
+                    'resp_errorMsg' => $txnReference['errorMsg']
+                ));
+            }
+            else {
+                $resp_transactions_missing[] = $txnReference['txnRef'];
+            }
+            
+        }
+
+        if(count($resp_transactions_missing) != 0) {
+            echo json_encode(array(
+                'success' => false,
+                'message' => 'missing transactions:'.implode(',', $resp_transactions_missing)
             ));
+            return;
         }
 
         echo json_encode(array(

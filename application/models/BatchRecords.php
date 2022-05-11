@@ -25,6 +25,13 @@ Class BatchRecords extends CI_Model
         return $this->db->query($query);
 	}
 
+	public function updateApiBulkResult($data) {
+		$query = "UPDATE batch_records SET resp_rcvStatus='".$data['resp_rcvStatus']."', resp_errorMsg='".$data['resp_errorMsg']."' WHERE transaction_ref='".$data['transaction_ref']."'";
+
+        return $this->db->query($query);
+	}
+
+
 	public function updateApiResultByTxn($data) {
 		$query = "UPDATE batch_records SET resp_rcvStatus='".$data['resp_rcvStatus']."', resp_errorMsg='".$data['resp_errorMsg']."' WHERE transaction_ref='".$data['transaction_ref']."'";
 
@@ -35,5 +42,13 @@ Class BatchRecords extends CI_Model
 		$query = "UPDATE batch_records SET resp_rcvStatus='".$status."' WHERE batch_file_id='".$batch_file_id."'";
 
         return $this->db->query($query);
+	}
+
+	public function existTransactionRef($transaction_ref){
+		
+		$query = "SELECT * FROM batch_records WHERE transaction_ref='".$transaction_ref."'";
+
+		$query_result = $this->db->query($query)->result_array();
+		return count($query_result) > 0;
 	}
 }
