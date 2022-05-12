@@ -21,7 +21,7 @@ Class BatchFiles extends CI_Model
 			return $query_result[0]['id'];
 		}
 		
-		$query = "INSERT INTO batch_files(`ref_id`, `batch_amount`, `status`, `submit_at`) VALUES('".$ref_id."', '0', 'SUBMITTED', NOW())";
+		$query = "INSERT INTO batch_files(`ref_id`,  `batch_number`, `batch_amount`, `status`, `submit_at`) VALUES('".$ref_id."', '".$ref_id."', '0', 'UPLOADED', NOW())";
         $this->db->query($query);
 
 		return $this->db->insert_id();
@@ -107,7 +107,7 @@ Class BatchFiles extends CI_Model
 	}
 
 	public function updateApiResult($data) {
-		$query = "UPDATE batch_files SET status='".$data['status']."' WHERE batch_number='".$data['batch_number']."'";
+		$query = "UPDATE batch_files SET status='".$data['status']."', error_msg='".$data['error_msg']."' WHERE batch_number='".$data['batch_number']."'";
 
         return $this->db->query($query);
 	}
@@ -119,7 +119,7 @@ Class BatchFiles extends CI_Model
 	}
 
 	public function manualSubmit($data) {
-		$query = "UPDATE batch_files SET batch_amount= cast(batch_amount AS DECIMAL(10, 2)) + cast('".$data['batch_amount']."' AS DECIMAL(10, 2)), currency='".$data['currency']."', total_records='".$data['total_records']."', status='SUBMITTED', `date`='".$data['date']."' WHERE id='".$data['id']."'";
+		$query = "UPDATE batch_files SET batch_amount= cast(batch_amount AS DECIMAL(10, 2)) + cast('".$data['batch_amount']."' AS DECIMAL(10, 2)), currency='".$data['currency']."', total_records='".$data['total_records']."', status='UPLOADED', `date`='".$data['date']."' WHERE id='".$data['id']."'";
 
         return $this->db->query($query);
 	}

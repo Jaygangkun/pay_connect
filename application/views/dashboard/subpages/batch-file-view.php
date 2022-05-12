@@ -38,7 +38,7 @@
             <div class="form-group">
                 <label for="batch_ref">Error Message</label>
                 <div class="input-group">
-                    <textarea name="batch_ref" id="batch_ref" class="form-control" readonly></textarea>
+                    <textarea name="batch_ref" id="batch_ref" class="form-control" readonly><?php echo isset($batch_file) ? str_replace("<br>", "\n", $batch_file['error_msg']) : ''?></textarea>
                 </div>
             </div>
           </div>

@@ -232,7 +232,7 @@ if(!function_exists('apiBuilkUpload')){
 			"processDate" => $data['process_date'],
 			"processTime" => $data['process_time']
 		));
-		$post_fields = str_replace('\"', '"', $post_fields);
+		// $post_fields = str_replace('\"', '"', $post_fields);
 
 		curl_setopt_array($curl, array(
 			CURLOPT_URL => 'https://5.9.24.51:8889/jethro/indata/',
@@ -255,9 +255,11 @@ if(!function_exists('apiBuilkUpload')){
 
 		$response = curl_exec($curl);
 
-		writeLog('>>>>>>>>');
+		writeLog('>>>>>>>>post_fields');
 		writeLog($post_fields);
+		writeLog('>>>>>>>>response');
 		writeLog($response);
+		writeLog('>>>>>>>>error');
 		writeLog(curl_error($curl));
 		writeLog('<<<<<<<<');
 

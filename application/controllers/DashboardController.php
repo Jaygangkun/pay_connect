@@ -230,7 +230,7 @@ class DashboardController extends CI_Controller {
 						'batch_amount' => $batch_amount,
 						'currency' => $currency,
 						'total_records' => $total_records,
-						'status' => '',
+						'status' => 'Uploaded',
 					);
 					$line_index ++;
 					continue;

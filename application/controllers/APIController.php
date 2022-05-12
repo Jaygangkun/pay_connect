@@ -62,10 +62,8 @@ class APIController extends CI_Controller {
             ));
             return;    
         }
-        $this->BatchFiles->updateApiResult(array(
-            'batch_number' => $body_data['BatchNumber'],
-            'status' => $body_data['statusCode'] == '77' ? 2 : 1,
-        ));
+
+        $txn_error_messages = '';        
 
         $resp_transactions_missing = [];
         $txnReferences = $body_data['txnReferences'];
@@ -77,12 +75,20 @@ class APIController extends CI_Controller {
                     'resp_rcvStatus' => $txnReference['procStatus'],
                     'resp_errorMsg' => $txnReference['errorMsg']
                 ));
+
+                $txn_error_messages .= $txnReference['errorMsg']."<br>";
             }
             else {
                 $resp_transactions_missing[] = $txnReference['txnRef'];
             }
             
         }
+
+        $this->BatchFiles->updateApiResult(array(
+            'batch_number' => $body_data['BatchNumber'],
+            'status' => $body_data['BatchStatus'],
+            'error_msg' => $txn_error_messages
+        ));
 
         if(count($resp_transactions_missing) != 0) {
             echo json_encode(array(
