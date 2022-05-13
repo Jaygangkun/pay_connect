@@ -86,6 +86,11 @@
   })
 
   $(document).on('click', '.action-authorise', function() {
+    var status = $(this).attr('data-status');
+    if(status.toLowerCase() == 'submitted') {
+      alert('Cannot authorise Submitted Batch');
+      return;
+    }
     <?php
     if(ableAuthorise($_SESSION['user']['role'])) {
       ?>

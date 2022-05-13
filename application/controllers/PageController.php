@@ -248,15 +248,15 @@ class PageController extends CI_Controller {
 			// Admin
 			$data['batch_files'] = array(
 				'processed' => count($this->BatchFiles->allByStatus('processed')),
-				'pending' => count($this->BatchFiles->allByStatus('pending')),
+				'pending' => count($this->BatchFiles->allByStatus('uploaded')),
 				'total' => count($this->BatchFiles->all()),
 			);
 		}
 		else {
 			$data['batch_files'] = array(
 				'processed' => count($this->BatchFiles->allByStatus('processed')),
-				'pending' => count($this->BatchFiles->allByStatus('pending')),
-				'acked' => count($this->BatchFiles->allByStatus('acked')),
+				'pending' => count($this->BatchFiles->allByStatus('uploaded')),
+				'acked' => count($this->BatchFiles->allByStatus('submitted')),
 			);
 		}
 		

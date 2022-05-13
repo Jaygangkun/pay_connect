@@ -461,7 +461,7 @@ class DashboardController extends CI_Controller {
 						<div class="dropdown-menu" role="menu">
 							<span class="dropdown-item action-view" data-id="'.$batch_file['id'].'">View</span>
 							<span class="dropdown-item action-delete" data-id="'.$batch_file['id'].'" data-status="'.$batch_file['status'].'">Delete</span>
-							<span class="dropdown-item action-authorise" data-id="'.$batch_file['id'].'">Authorise</span>
+							<span class="dropdown-item action-authorise" data-id="'.$batch_file['id'].'" data-status="'.$batch_file['status'].'">Authorise</span>
 							<span class="dropdown-item action-submit" data-id="'.$batch_file['id'].'">Submit</span>
 						</div>
 					</div>
@@ -526,7 +526,7 @@ class DashboardController extends CI_Controller {
 						<div class="dropdown-menu" role="menu">
 							<span class="dropdown-item action-view" data-id="'.$batch_file['id'].'">View</span>
 							<span class="dropdown-item action-delete" data-id="'.$batch_file['id'].'" data-status="'.$batch_file['status'].'">Delete</span>
-							<span class="dropdown-item action-authorise" data-id="'.$batch_file['id'].'">Authorise</span>
+							<span class="dropdown-item action-authorise" data-id="'.$batch_file['id'].'" data-status="'.$batch_file['status'].'">Authorise</span>
 							<span class="dropdown-item action-resubmit" data-id="'.$batch_file['id'].'">Resubmit</span>
 						</div>
 					</div>
