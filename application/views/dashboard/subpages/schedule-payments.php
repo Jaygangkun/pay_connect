@@ -88,7 +88,7 @@
   $(document).on('click', '.action-authorise', function() {
     var status = $(this).attr('data-status');
     if(status.toLowerCase() == 'submitted') {
-      alert('Cannot authorise Submitted Batch');
+      alert('Batch already Submitted');
       return;
     }
     <?php
