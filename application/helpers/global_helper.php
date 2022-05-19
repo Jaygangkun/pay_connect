@@ -19,24 +19,31 @@ if(!function_exists('writeLog')){
 	}
 }
 
+if(!function_exists('config')){
+    function config($item){
+		$ci=& get_instance();
+		return $ci->config->item($item);
+	}
+}
+
 if(!function_exists('sendMail')){
     function sendMail($to, $subject, $body){
 		$mail = new PHPMailer();
 
 		$mail->IsSMTP();
-		$mail->Host = 'server97.web-hosting.com';
-		$mail->Port = 465;
+		$mail->Host = config('smtp_host');
+		$mail->Port = config('smtp_port');
 		$mail->SMTPAuth = true;
-		$mail->Username = 'support@devwork.pro';
-		$mail->Password = 'devwork@132';
-		$mail->SMTPSecure = 'ssl';
+		$mail->Username = config('smtp_user');
+		$mail->Password = config('smtp_password');
+		$mail->SMTPSecure = config('smtp_secure');
 		$mail->SMTPDebug  = 0;  
 		$mail->SMTPAuth   = TRUE;
 
 		$mail->isHTML();
 
-		$mail->From = 'support@devwork.pro';
-		$mail->FromName = 'PayConnect';
+		$mail->From = config('mail_from');
+		$mail->FromName = config('mail_from_name');
 
 		$mail->Subject = $subject;
     	$mail->Body    = $body;
@@ -189,7 +196,7 @@ if(!function_exists('statusColor')){
 }
 
 if(!function_exists('apiBuilkUpload')){
-    function apiBuilkUpload($data){		
+    function apiBuilkUpload($api_url, $data){		
 		$curl = curl_init();
 
 		// $post_fields = '{
@@ -235,7 +242,7 @@ if(!function_exists('apiBuilkUpload')){
 		// $post_fields = str_replace('\"', '"', $post_fields);
 
 		curl_setopt_array($curl, array(
-			CURLOPT_URL => 'https://5.9.24.51:8889/jethro/indata/',
+			CURLOPT_URL => $api_url,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_SSL_VERIFYHOST=> false,
 			CURLOPT_SSL_VERIFYPEER => false,

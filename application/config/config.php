@@ -534,6 +534,18 @@ $config['proxy_ips'] = '';
 $config['user_password_default'] = 'test';
 
 // 3rd api params
+$config['api_url'] = 'https://5.9.24.51:8889/jethro/indata/';
+
 $config['api_process_type'] = 'bulkpay';
 $config['api_batch_inputter'] = 'ZAKARIYA';
 $config['api_batch_authoriser'] = 'ABDIMAJID';
+
+// smtp
+$config['smtp_host'] = 'server97.web-hosting.com';
+$config['smtp_user'] = 'support@devwork.pro';
+$config['smtp_password'] = 'devwork@132';
+$config['smtp_port'] = 465;
+$config['smtp_secure'] = 'ssl';
+
+$config['mail_from'] = 'support@devwork.pro';
+$config['mail_from_name'] = 'PayConnect';
