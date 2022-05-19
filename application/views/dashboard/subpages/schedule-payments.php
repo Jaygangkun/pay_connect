@@ -50,7 +50,7 @@
 
   $(document).on('click', '.action-resubmit', function() {
     <?php
-    if(ableUpload($_SESSION['user']['role'])) {
+    if(ableSubmit($_SESSION['user']['role'])) {
       ?>
       var btn_group_wrap = $(this).parents('.btn-group-wrap');
       $(btn_group_wrap).addClass('loading');

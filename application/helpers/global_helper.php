@@ -105,14 +105,11 @@ if(!function_exists('ableSubmit')){
 		$roles = explode(',', $role);
 		foreach($roles as $role) {
 			if($role == 4) { // uploader
-				continue;
-			}
-			else {
-				return true;
+				return false;
 			}
 		}
 
-		return false;
+		return true;
 	}
 }
 
@@ -223,6 +220,7 @@ if(!function_exists('apiBuilkUpload')){
 			"processType" => $data['process_type'],
 			"BatchNumber" => $data['batch_number'],
 			"NoOfPayment" => $data['no_of_payment'],
+			"PaymentSeq" => $data['payment_seq'],
 			"batchDate" => $data['batch_date'],
 			"txnRef" => $data['txn_ref'],
 			"txnCurr" => $data['txn_curr'],
@@ -254,7 +252,7 @@ if(!function_exists('apiBuilkUpload')){
 			CURLOPT_CUSTOMREQUEST => 'POST',
 			CURLOPT_POSTFIELDS =>$post_fields,
 			CURLOPT_HTTPHEADER => array(
-				'Authorization: Basic TlE4RDZRUzlMdnh4N3c0ZjM3REM6NHN1Qk5IaUNpeUtaN3dXc3Vpd3o=',
+				'Authorization: '.config('api_auth'),
 				'Content-Type: text/plain',
 				'Cookie: JSESSIONID=F6D1AB7C27064B724868303B94CCB76D'
 			),

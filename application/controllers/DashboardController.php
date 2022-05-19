@@ -198,6 +198,9 @@ class DashboardController extends CI_Controller {
 
 			$department_error = false;
 			$department_missing_list = [];
+
+			$records_amount_sum = 0;
+			$batch_total_amount = 0;
 			foreach($lines as $line) {
 
 				if($line_index == 0) {
@@ -232,6 +235,7 @@ class DashboardController extends CI_Controller {
 						'total_records' => $total_records,
 						'status' => 'Uploaded',
 					);
+					$batch_total_amount = floatval($batch_amount);
 					$line_index ++;
 					continue;
 				}
@@ -270,7 +274,16 @@ class DashboardController extends CI_Controller {
 					'status' => '', 
 				);
 
+				$records_amount_sum += floatval($line[3]);
 				$line_index++;
+			}
+
+			// check total amount
+			if($records_amount_sum != $batch_total_amount) {
+				$this->output->set_status_header('400'); //Triggers the jQuery error callback
+				$this->output->set_content_type('application/json');
+				$this->output->set_output(json_encode(array('error' => 'Total Amount on Batch is wrong!'))); //Triggers the jQuery error callback
+				return;
 			}
 
 			$error_message = '';
@@ -349,12 +362,14 @@ class DashboardController extends CI_Controller {
 			$batch_records = $this->BatchRecords->loadByBatchFileID($id);
 
 			$batch_file_submit_error = false;
+			$batch_record_index = 1;
 			foreach($batch_records as $batch_record) {
 				$date = new DateTime();
 				$resp = apiBuilkUpload($this->config->item('api_url'), array(
 					'process_type' => $this->config->item('api_process_type'),
 					'batch_number' => $batch_file['batch_number'],
 					'no_of_payment' => $batch_file['total_records'],
+					'payment_seq' => $batch_record_index,
 					'payment_seq' => $batch_record['payment_seq'],
 					'batch_date' => $batch_file['date'],
 					'txn_ref' => $batch_record['transaction_ref'],
@@ -384,6 +399,8 @@ class DashboardController extends CI_Controller {
 					'resp_rcvStatus' => $resp['rcvStatus'],
 					'resp_errorMsg' => $resp['errorMsg']
 				));
+
+				$batch_record_index++;
 			}
 
 			// $this->BatchFiles->updateSubmitResult(array(
@@ -462,7 +479,7 @@ class DashboardController extends CI_Controller {
 							<span class="dropdown-item action-view" data-id="'.$batch_file['id'].'">View</span>
 							<span class="dropdown-item action-delete" data-id="'.$batch_file['id'].'" data-status="'.$batch_file['status'].'">Delete</span>
 							<span class="dropdown-item action-authorise" data-id="'.$batch_file['id'].'" data-status="'.$batch_file['status'].'">Authorise</span>
-							<span class="dropdown-item action-submit" data-id="'.$batch_file['id'].'">Submit</span>
+							<span class="dropdown-item action-submit" data-id="'.$batch_file['id'].'" data-status="'.$batch_file['status'].'">Submit</span>
 						</div>
 					</div>
 					<div class="actions-loading-wrap">
@@ -527,7 +544,7 @@ class DashboardController extends CI_Controller {
 							<span class="dropdown-item action-view" data-id="'.$batch_file['id'].'">View</span>
 							<span class="dropdown-item action-delete" data-id="'.$batch_file['id'].'" data-status="'.$batch_file['status'].'">Delete</span>
 							<span class="dropdown-item action-authorise" data-id="'.$batch_file['id'].'" data-status="'.$batch_file['status'].'">Authorise</span>
-							<span class="dropdown-item action-resubmit" data-id="'.$batch_file['id'].'">Resubmit</span>
+							<span class="dropdown-item action-resubmit" data-id="'.$batch_file['id'].'" >Resubmit</span>
 						</div>
 					</div>
 					<div class="actions-loading-wrap">

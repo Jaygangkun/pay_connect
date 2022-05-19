@@ -535,6 +535,7 @@ $config['user_password_default'] = 'test';
 
 // 3rd api params
 $config['api_url'] = 'https://5.9.24.51:8889/jethro/indata/';
+$config['api_auth'] = 'Basic TlE4RDZRUzlMdnh4N3c0ZjM3REM6NHN1Qk5IaUNpeUtaN3dXc3Vpd3o=';
 
 $config['api_process_type'] = 'bulkpay';
 $config['api_batch_inputter'] = 'ZAKARIYA';

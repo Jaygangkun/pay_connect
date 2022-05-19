@@ -167,8 +167,13 @@
   
   $(document).on('click', '.action-submit', function() {
     <?php
-    if(ableUpload($_SESSION['user']['role'])) {
+    if(ableSubmit($_SESSION['user']['role'])) {
       ?>
+      var status = $(this).attr('data-status');
+      if(status.toLowerCase() != 'authorised') {
+        alert('Batch need to authorise');
+        return;
+      }
       var btn_group_wrap = $(this).parents('.btn-group-wrap');
       $(btn_group_wrap).addClass('loading');
       $(btn_group_wrap).find('.btn').addClass('disabled');
