@@ -105,11 +105,14 @@ if(!function_exists('ableSubmit')){
 		$roles = explode(',', $role);
 		foreach($roles as $role) {
 			if($role == 4) { // uploader
-				return false;
+				continue;
+			}
+			else {
+				return true;
 			}
 		}
 
-		return true;
+		return false;
 	}
 }
 
