@@ -263,22 +263,25 @@ if(!function_exists('apiBuilkUpload')){
 		
 				$response = curl_exec($curl);
 		
-				if(curl_exec($curl) === false)
-				{
-					return array(
-						'server_error' => true,
-						'error_message' => curl_error($curl)
-					);
-				}
-
+				writeLog('>>>>>>>>api calling'.$gateway->endpoint);
 				writeLog('>>>>>>>>post_fields');
 				writeLog($post_fields);
 				writeLog('>>>>>>>>response');
 				writeLog($response);
-				writeLog('>>>>>>>>error');
-				writeLog(curl_error($curl));
+				
+				if(curl_exec($curl) === false)
+				{
+					writeLog('>>>>>>>>error');
+					writeLog(curl_error($curl));
+					writeLog('<<<<<<<<');
+					
+					return array(
+						'server_error' => true,
+						'error_message' => curl_error($curl)
+					);
+				}		
+
 				writeLog('<<<<<<<<');
-		
 				curl_close($curl);
 		
 				return json_decode($response, true);		
