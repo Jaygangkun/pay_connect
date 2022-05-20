@@ -208,14 +208,14 @@ if(!function_exists('statusColor')){
 }
 
 if(!function_exists('apiBuilkUpload')){
-    function apiBuilkUpload($api_url, $data){		
+    function apiBuilkUpload($data){		
 		$ci =& get_instance();
 		$ci->load->database();
 		$sql = "SELECT * FROM gateways WHERE status='Active'";
 		$q = $ci->db->query($sql);
 		if($q->num_rows() > 0)
 		{
-			foreach($q->result() as $data)
+			foreach($q->result() as $gateway)
 			{
 				$curl = curl_init();
 		
@@ -243,7 +243,7 @@ if(!function_exists('apiBuilkUpload')){
 				// $post_fields = str_replace('\"', '"', $post_fields);
 		
 				curl_setopt_array($curl, array(
-					CURLOPT_URL => $data->endpoint,
+					CURLOPT_URL => $gateway->endpoint,
 					CURLOPT_RETURNTRANSFER => true,
 					CURLOPT_SSL_VERIFYHOST=> false,
 					CURLOPT_SSL_VERIFYPEER => false,
@@ -255,7 +255,7 @@ if(!function_exists('apiBuilkUpload')){
 					CURLOPT_CUSTOMREQUEST => 'POST',
 					CURLOPT_POSTFIELDS =>$post_fields,
 					CURLOPT_HTTPHEADER => array(
-						'Authorization: '.$data->auth,
+						'Authorization: '.$gateway->auth,
 						'Content-Type: text/plain',
 						'Cookie: JSESSIONID=F6D1AB7C27064B724868303B94CCB76D'
 					),
@@ -263,6 +263,14 @@ if(!function_exists('apiBuilkUpload')){
 		
 				$response = curl_exec($curl);
 		
+				if(curl_exec($curl) === false)
+				{
+					return array(
+						'server_error' => true,
+						'error_message' => curl_error($curl)
+					);
+				}
+
 				writeLog('>>>>>>>>post_fields');
 				writeLog($post_fields);
 				writeLog('>>>>>>>>response');

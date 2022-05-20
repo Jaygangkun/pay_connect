@@ -365,7 +365,7 @@ class DashboardController extends CI_Controller {
 			$batch_record_index = 1;
 			foreach($batch_records as $batch_record) {
 				$date = new DateTime();
-				$resp = apiBuilkUpload($this->config->item('api_url'), array(
+				$resp = apiBuilkUpload(array(
 					'process_type' => $this->config->item('api_process_type'),
 					'batch_number' => $batch_file['batch_number'],
 					'no_of_payment' => $batch_file['total_records'],
@@ -388,6 +388,14 @@ class DashboardController extends CI_Controller {
 					'process_date' => $date->format('Y').$date->format('m').$date->format('t'),
 					'process_time' => $date->format('H').$date->format('i').$date->format('s')
 				));
+
+				if(isset($resp['server_error']) && $resp['server_error']) {
+					echo json_encode(array(
+						'success' => false,
+						'message' => $resp['error_message']
+					));
+					return;
+				}
 
 				if($resp['statusCode'] == '77') {
 					$batch_file_submit_error = true;
