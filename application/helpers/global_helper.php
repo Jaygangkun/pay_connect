@@ -28,35 +28,47 @@ if(!function_exists('config')){
 
 if(!function_exists('sendMail')){
     function sendMail($to, $subject, $body){
-		$mail = new PHPMailer();
+		$ci =& get_instance();
+		$ci->load->database();
+		$sql = "SELECT * FROM email_servers WHERE default='1'";
+		$q = $ci->db->query($sql);
+		if($q->num_rows() > 0)
+		{
+			foreach($q->result() as $data)
+			{
+// 				echo $data->ssl_tls ? 'ssl'."<br>" : ''."<br>";
+// continue;
+				$mail = new PHPMailer();
 
-		$mail->IsSMTP();
-		$mail->Host = config('smtp_host');
-		$mail->Port = config('smtp_port');
-		$mail->SMTPAuth = true;
-		$mail->Username = config('smtp_user');
-		$mail->Password = config('smtp_password');
-		$mail->SMTPSecure = config('smtp_secure');
-		$mail->SMTPDebug  = 0;  
-		$mail->SMTPAuth   = TRUE;
+				$mail->IsSMTP();
+				$mail->Host = $data->host;
+				$mail->Port = $data->port;
+				$mail->SMTPAuth = true;
+				$mail->Username = $data->user;
+				$mail->Password = $data->password;
+				$mail->SMTPSecure = $data->ssl_tls ? 'ssl' : '';
+				$mail->SMTPDebug  = 0;  
+				$mail->SMTPAuth   = TRUE;
 
-		$mail->isHTML();
+				$mail->isHTML();
 
-		$mail->From = config('mail_from');
-		$mail->FromName = config('mail_from_name');
+				$mail->From = $data->user;
+				$mail->FromName = $data->sender;
 
-		$mail->Subject = $subject;
-    	$mail->Body    = $body;
-		$mail->AddAddress($to);
+				$mail->Subject = $subject;
+				$mail->Body    = $body;
+				$mail->AddAddress($to);
 
-		if(!$mail->Send()) {
-			// echo $mail->ErrorInfo;
-			writeLog("sendMail fail");
-			writeLog($mail->ErrorInfo);
-			return false;
+				if(!$mail->Send()) {
+					// echo $mail->ErrorInfo;
+					writeLog("sendMail fail:".$data->host);
+					writeLog($mail->ErrorInfo);
+					return false;
+				}
+				writeLog("sendMail success:".$data->host);
+				return true;
+			}
 		}
-		writeLog("sendMail success");
-		return true;
 	}
 }
 
@@ -197,83 +209,73 @@ if(!function_exists('statusColor')){
 
 if(!function_exists('apiBuilkUpload')){
     function apiBuilkUpload($api_url, $data){		
-		$curl = curl_init();
-
-		// $post_fields = '{
-		// 	"processType": "'.$data['process_type'].'",
-		// 	"BatchNumber":"'.$data['batch_number'].'",
-		// 	"NoOfPayment":"'.$data['no_of_payment'].'",
-		// 	"batchDate":'.$data['batch_date'].',
-		// 	"txnRef":"'.$data['txn_ref'].'",
-		// 	"txnCurr":"'.$data['txn_curr'].'",
-		// 	"settlementDate":'.$data['settlement_date'].',
-		// 	"ordCustAccount":'.$data['ord_cust_account'].',
-		// 	"ordCusName":"'.$data['ord_cust_name'].'",
-		// 	"txnPurpose":"'.$data['txn_purpose'].'",
-		// 	"benBankBIC":"'.$data['ben_bank_bic'].'",
-		// 	"benAccount":"'.$data['ben_account'].'",
-		// 	"benName": "'.$data['ben_name'].'",
-		// 	"benCrAmount":"'.$data['ben_cr_amount'].'",
-		// 	"batchInputter":"'.$data['batch_inputter'].'",
-		// 	"batchAuthoriser":"'.$data['batch_authoriser'].'",
-		// 	"processDate":'.$data['process_date'].',
-		// 	"processTime":'.$data['process_time'].'
-		// }';
-		$post_fields = json_encode(array(
-			"processType" => $data['process_type'],
-			"BatchNumber" => $data['batch_number'],
-			"NoOfPayment" => $data['no_of_payment'],
-			"PaymentSeq" => $data['payment_seq'],
-			"batchDate" => $data['batch_date'],
-			"txnRef" => $data['txn_ref'],
-			"txnCurr" => $data['txn_curr'],
-			"settlementDate" => $data['settlement_date'],
-			"ordCustAccount" => $data['ord_cust_account'],
-			"ordCusName" => $data['ord_cust_name'],
-			"txnPurpose" => $data['txn_purpose'],
-			"benBankBIC" => $data['ben_bank_bic'],
-			"benAccount" => $data['ben_account'],
-			"benName" => $data['ben_name'],
-			"benCrAmount" => $data['ben_cr_amount'],
-			"batchInputter" => $data['batch_inputter'],
-			"batchAuthoriser" => $data['batch_authoriser'],
-			"processDate" => $data['process_date'],
-			"processTime" => $data['process_time']
-		));
-		// $post_fields = str_replace('\"', '"', $post_fields);
-
-		curl_setopt_array($curl, array(
-			CURLOPT_URL => $api_url,
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_SSL_VERIFYHOST=> false,
-			CURLOPT_SSL_VERIFYPEER => false,
-			CURLOPT_ENCODING => '',
-			CURLOPT_MAXREDIRS => 10,
-			CURLOPT_TIMEOUT => 0,
-			CURLOPT_FOLLOWLOCATION => true,
-			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST => 'POST',
-			CURLOPT_POSTFIELDS =>$post_fields,
-			CURLOPT_HTTPHEADER => array(
-				'Authorization: '.config('api_auth'),
-				'Content-Type: text/plain',
-				'Cookie: JSESSIONID=F6D1AB7C27064B724868303B94CCB76D'
-			),
-		));
-
-		$response = curl_exec($curl);
-
-		writeLog('>>>>>>>>post_fields');
-		writeLog($post_fields);
-		writeLog('>>>>>>>>response');
-		writeLog($response);
-		writeLog('>>>>>>>>error');
-		writeLog(curl_error($curl));
-		writeLog('<<<<<<<<');
-
-		curl_close($curl);
-
-		return json_decode($response, true);
+		$ci =& get_instance();
+		$ci->load->database();
+		$sql = "SELECT * FROM gateways WHERE status='Active'";
+		$q = $ci->db->query($sql);
+		if($q->num_rows() > 0)
+		{
+			foreach($q->result() as $data)
+			{
+				$curl = curl_init();
+		
+				$post_fields = json_encode(array(
+					"processType" => $data['process_type'],
+					"BatchNumber" => $data['batch_number'],
+					"NoOfPayment" => $data['no_of_payment'],
+					"PaymentSeq" => $data['payment_seq'],
+					"batchDate" => $data['batch_date'],
+					"txnRef" => $data['txn_ref'],
+					"txnCurr" => $data['txn_curr'],
+					"settlementDate" => $data['settlement_date'],
+					"ordCustAccount" => $data['ord_cust_account'],
+					"ordCusName" => $data['ord_cust_name'],
+					"txnPurpose" => $data['txn_purpose'],
+					"benBankBIC" => $data['ben_bank_bic'],
+					"benAccount" => $data['ben_account'],
+					"benName" => $data['ben_name'],
+					"benCrAmount" => $data['ben_cr_amount'],
+					"batchInputter" => $data['batch_inputter'],
+					"batchAuthoriser" => $data['batch_authoriser'],
+					"processDate" => $data['process_date'],
+					"processTime" => $data['process_time']
+				));
+				// $post_fields = str_replace('\"', '"', $post_fields);
+		
+				curl_setopt_array($curl, array(
+					CURLOPT_URL => $data->endpoint,
+					CURLOPT_RETURNTRANSFER => true,
+					CURLOPT_SSL_VERIFYHOST=> false,
+					CURLOPT_SSL_VERIFYPEER => false,
+					CURLOPT_ENCODING => '',
+					CURLOPT_MAXREDIRS => 10,
+					CURLOPT_TIMEOUT => 0,
+					CURLOPT_FOLLOWLOCATION => true,
+					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+					CURLOPT_CUSTOMREQUEST => 'POST',
+					CURLOPT_POSTFIELDS =>$post_fields,
+					CURLOPT_HTTPHEADER => array(
+						'Authorization: '.$data->auth,
+						'Content-Type: text/plain',
+						'Cookie: JSESSIONID=F6D1AB7C27064B724868303B94CCB76D'
+					),
+				));
+		
+				$response = curl_exec($curl);
+		
+				writeLog('>>>>>>>>post_fields');
+				writeLog($post_fields);
+				writeLog('>>>>>>>>response');
+				writeLog($response);
+				writeLog('>>>>>>>>error');
+				writeLog(curl_error($curl));
+				writeLog('<<<<<<<<');
+		
+				curl_close($curl);
+		
+				return json_decode($response, true);		
+			}
+		}
 
 	}
 }

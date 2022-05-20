@@ -82,6 +82,15 @@
               </div>
             </div>
           </div>
+
+          <div class="row mt-2">
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label>EndPoint - Auth</label>
+                <input type="text" class="form-control" placeholder="" id="auth"/>
+              </div>
+            </div>
+          </div>
   
           <div class="row mt-2">
             <div class="col-sm-6">
@@ -149,6 +158,7 @@ $(document).on('click', '#btn_save', function() {
       short_name: $('#short_name').val(),
       description: $('#description').val(),
       endpoint: $('#endpoint').val(),
+      auth: $('#auth').val(),
       direction: $('#direction').val(),
       status: $('#status option:selected').text(),
     },
@@ -175,6 +185,7 @@ $(document).on('click', '#btn_update', function() {
       short_name: $('#short_name').val(),
       description: $('#description').val(),
       endpoint: $('#endpoint').val(),
+      auth: $('#auth').val(),
       direction: $('#direction').val(),
       status: $('#status option:selected').text(),
     },
@@ -217,6 +228,7 @@ $(document).on('click', '#btn_modal_add_gateway', function() {
   $('#modal_add_gateway #short_name').val('');
   $('#modal_add_gateway #description').val('');
   $('#modal_add_gateway #endpoint').val('');
+  $('#modal_add_gateway #auth').val('');
   $('#modal_add_gateway #direction').val('');
   $('#modal_add_gateway #status').val('');
 
@@ -241,6 +253,7 @@ $('#gateways tbody').on('click', 'tr', function (event) {
   $('#modal_add_gateway #short_name').val(row_data[0]);
   $('#modal_add_gateway #description').val(row_data[1]);
   $('#modal_add_gateway #endpoint').val(row_data[3]);
+  $('#modal_add_gateway #auth').val(row_data[8]);
   $('#modal_add_gateway #direction').val(row_data[2]);
   $('#modal_add_gateway #status').val(row_data[6]);
   $('#modal_add_gateway #gateway_id').val(row_data[7]);

@@ -817,6 +817,7 @@ class DashboardController extends CI_Controller {
 				"<span class='btn btn-danger btn-delete' gateway-id='".$gateway['id']."'>Delete</span>",
 				$gateway['status'],
 				$gateway['id'],
+				$gateway['auth'],
 			);
 		}
 
@@ -829,6 +830,7 @@ class DashboardController extends CI_Controller {
 			'short_name' => isset($_POST['short_name']) ? $_POST['short_name'] : '',
 			'description' => isset($_POST['description']) ? $_POST['description'] : '',
 			'endpoint' => isset($_POST['endpoint']) ? $_POST['endpoint'] : '',
+			'auth' => isset($_POST['auth']) ? $_POST['auth'] : '',
 			'direction' => isset($_POST['direction']) ? $_POST['direction'] : '',
 			'status' => isset($_POST['status']) ? $_POST['status'] : ''
 		));
@@ -852,6 +854,7 @@ class DashboardController extends CI_Controller {
 			'short_name' => isset($_POST['short_name']) ? $_POST['short_name'] : '',
 			'description' => isset($_POST['description']) ? $_POST['description'] : '',
 			'endpoint' => isset($_POST['endpoint']) ? $_POST['endpoint'] : '',
+			'auth' => isset($_POST['auth']) ? $_POST['auth'] : '',
 			'direction' => isset($_POST['direction']) ? $_POST['direction'] : '',
 			'status' => isset($_POST['status']) ? $_POST['status'] : ''
 		));
