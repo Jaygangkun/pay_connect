@@ -30,7 +30,7 @@ if(!function_exists('sendMail')){
     function sendMail($to, $subject, $body){
 		$ci =& get_instance();
 		$ci->load->database();
-		$sql = "SELECT * FROM email_servers WHERE default='1'";
+		$sql = "SELECT * FROM email_servers WHERE `default`='1'";
 		$q = $ci->db->query($sql);
 		if($q->num_rows() > 0)
 		{
