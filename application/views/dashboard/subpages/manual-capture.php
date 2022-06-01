@@ -12,7 +12,7 @@
                                 <div class="form-group">
                                     <label for="batch_ref">Batch Ref Number</label>
                                     <div class="input-group">
-                                        <input type="text" name="batch_ref" id="batch_ref" class="form-control" value="<?php echo refGenerate()?>">
+                                        <input type="text" name="batch_ref" id="batch_ref" class="form-control" value="<?php echo genBatchNumber()?>">
                                         <div class="input-group-append">
                                             <button class="btn btn-default btn-ref-generate" ref-id="batch_ref">
                                                 <i class="fa fa-plus"></i>
@@ -26,7 +26,7 @@
                                 <div class="form-group">
                                     <label for="transaction_ref">Txn Reference Number</label>
                                     <div class="input-group">
-                                        <input type="text" name="transaction_ref" id="transaction_ref" class="form-control" value="<?php echo refGenerate()?>">
+                                        <input type="text" name="transaction_ref" id="transaction_ref" class="form-control" value="<?php echo genTransactionRef(null)?>">
                                         <div class="input-group-append">
                                             <button class="btn btn-default btn-ref-generate" ref-id="transaction_ref">
                                                 <i class="fa fa-plus"></i>

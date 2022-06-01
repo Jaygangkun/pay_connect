@@ -291,4 +291,54 @@ if(!function_exists('apiBuilkUpload')){
 	}
 }
 
+if(!function_exists('genBatchNumber')){
+    function genBatchNumber(){
+		$date = new DateTime();
+		$DDMMYYYY = $date->format('m').$date->format('d').$date->format('Y');
+		$NNNN = 1;
+
+		$ci =& get_instance();
+		$ci->load->database();
+		$sql = "SELECT count(*) as total FROM batch_files WHERE DATE(`upload_at`)=DATE(NOW())";
+		$q = $ci->db->query($sql);
+		if($q->num_rows() > 0)
+		{
+			foreach($q->result() as $batch_files) {
+				$NNNN = $batch_files->total + 1;
+				break;
+			}
+		}
+
+		$NNNN = str_pad($NNNN, 4, '0', STR_PAD_LEFT);
+
+		return "MOF".$DDMMYYYY."BP".$NNNN;
+	}
+}
+
+if(!function_exists('genTransactionRef')){
+    function genTransactionRef($batch_file_id){
+		$date = new DateTime();
+		$DDMMYYYY = $date->format('m').$date->format('d').$date->format('Y');
+		$NNNN = 1;
+
+		if($batch_file_id != null) {
+			$ci =& get_instance();
+			$ci->load->database();
+			$sql = "SELECT count(*) as total FROM batch_records WHERE `batch_file_id`='".$batch_file_id."'";
+			$q = $ci->db->query($sql);
+			if($q->num_rows() > 0)
+			{
+				foreach($q->result() as $batch_files) {
+					$NNNN = $batch_files->total + 1;
+					break;
+				}
+			}
+		}
+
+		$NNNN = str_pad($NNNN, 4, '0', STR_PAD_LEFT);
+
+		return "MOF".$DDMMYYYY.$NNNN;
+	}
+}
+
 ?>

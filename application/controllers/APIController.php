@@ -12,7 +12,8 @@ class APIController extends CI_Controller {
     }
     
     public function refGenerate() {
-        echo refGenerate();
+        // echo genBatchNumber();
+        echo genTransactionRef(null);
     }
 
     public function payUpdate() {

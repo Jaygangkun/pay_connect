@@ -206,7 +206,8 @@ class DashboardController extends CI_Controller {
 				if($line_index == 0) {
 					$account = $line[1];
 					$date = $line[2];
-					$batch_number = $line[3];
+					// $batch_number = $line[3];
+					$batch_number = genBatchNumber();
 					$batch_amount = $line[4];
 					$currency = $line[5];
 					$total_records = $line[6];
@@ -240,7 +241,8 @@ class DashboardController extends CI_Controller {
 					continue;
 				}
 
-				$transaction_ref = refGenerate();
+				// $transaction_ref = refGenerate();
+				// $transaction_ref = genTransactionRef();
 
 				// check bic code
 				
@@ -264,7 +266,7 @@ class DashboardController extends CI_Controller {
 
 				$batch_records_add_list[] = array(
 					'payment_seq' => $line_index,
-					'transaction_ref' => $transaction_ref,
+					// 'transaction_ref' => $transaction_ref,
 					'beneficiary_name' => $line[1],
 					'account_number' => $line[2],
 					'amount_pay' => $line[3],
@@ -314,6 +316,7 @@ class DashboardController extends CI_Controller {
 			foreach($batch_records_add_list as $batch_records_add_item) {
 				$new_batch_records_add_item = $batch_records_add_item;
 				$new_batch_records_add_item['batch_file_id'] = $batch_file_id;
+				$new_batch_records_add_item['transaction_ref'] = genTransactionRef($batch_file_id);
 
 				$this->BatchRecords->add($new_batch_records_add_item);
 			}
@@ -374,7 +377,7 @@ class DashboardController extends CI_Controller {
 					'batch_date' => $batch_file['date'],
 					'txn_ref' => $batch_record['transaction_ref'],
 					'txn_curr' => $batch_file['currency'],
-					'settlement_date' => $date->format('Y').$date->format('m').$date->format('t'),
+					'settlement_date' => $date->format('Y').$date->format('m').$date->format('d'),
 					'ord_cust_account' => '',
 					'ord_cust_name' => '',
 					'department' => $batch_record['department'],
@@ -385,7 +388,7 @@ class DashboardController extends CI_Controller {
 					'ben_cr_amount' => $batch_record['amount_pay'],
 					'batch_inputter' => $this->config->item('api_batch_inputter'),
 					'batch_authoriser' => $this->config->item('api_batch_authoriser'),
-					'process_date' => $date->format('Y').$date->format('m').$date->format('t'),
+					'process_date' => $date->format('Y').$date->format('m').$date->format('d'),
 					'process_time' => $date->format('H').$date->format('i').$date->format('s')
 				));
 
@@ -645,7 +648,7 @@ class DashboardController extends CI_Controller {
 			'batch_amount' => $amount_pay == '' ? 0 : $amount_pay,
 			'currency' => 'USD',
 			'total_records' => $payment_seq,
-			'date' => $date->format('m')."/".$date->format('t')."/".$date->format('Y')
+			'date' => $date->format('m')."/".$date->format('d')."/".$date->format('Y')
 		));
 
 		echo json_encode(array(
