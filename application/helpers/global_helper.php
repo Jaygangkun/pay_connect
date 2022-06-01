@@ -294,7 +294,7 @@ if(!function_exists('apiBuilkUpload')){
 if(!function_exists('genBatchNumber')){
     function genBatchNumber(){
 		$date = new DateTime();
-		$DDMMYYYY = $date->format('m').$date->format('d').$date->format('Y');
+		$DDMMYYYY = $date->format('d').$date->format('m').$date->format('Y');
 		$NNNN = 1;
 
 		$ci =& get_instance();
@@ -318,7 +318,7 @@ if(!function_exists('genBatchNumber')){
 if(!function_exists('genTransactionRef')){
     function genTransactionRef($batch_file_id){
 		$date = new DateTime();
-		$DDMMYYYY = $date->format('m').$date->format('d').$date->format('Y');
+		$DDMMYYYY = $date->format('d').$date->format('m').$date->format('Y');
 		$NNNN = 1;
 
 		if($batch_file_id != null) {

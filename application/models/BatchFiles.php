@@ -123,4 +123,17 @@ Class BatchFiles extends CI_Model
 
         return $this->db->query($query);
 	}
+
+	public function getIDFromBatchNumber($batch_number){
+		
+		$query = "SELECT * FROM batch_files WHERE batch_number='".$batch_number."'";
+		
+		$batch_files = $this->db->query($query)->result_array();
+
+		foreach($batch_files as $batch_file) {
+			return $batch_file['id'];
+		}
+
+		return null;
+	}
 }
