@@ -77,7 +77,9 @@ $route['users'] = 'DashboardController/pageUsers';
 $route['user-activities'] = 'DashboardController/pageUserActivities';
 
 // global apis
-$route['api-ref-generate'] = 'APIController/refGenerate';
+$route['api-transaction-generate'] = 'APIController/transactionGenerate';
+$route['api-batch-generate'] = 'APIController/batchGenerate';
+
 
 // user urls
 $route['api-upload'] = 'DashboardController/apiUpload';

@@ -11,9 +11,12 @@ class APIController extends CI_Controller {
         $this->load->model("BatchRecords");
     }
     
-    public function refGenerate() {
-        // echo genBatchNumber();
+    public function transactionGenerate() {
         echo genTransactionRef(null);
+    }
+
+    public function batchGenerate() {
+        echo genBatchNumber();
     }
 
     public function payUpdate() {

@@ -51,7 +51,7 @@
                   <th>Transaction Ref</th>
                   <th>Beneficiary Name</th>
                   <th>Account Number</th>
-                  <th>Account to Pay</th>
+                  <th>Amount to Pay</th>
                   <th>Department</th>
                   <th>Benef Bank</th>
                   <th>Bank BICCODE</th>

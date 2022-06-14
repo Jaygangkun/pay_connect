@@ -182,6 +182,7 @@ class DashboardController extends CI_Controller {
 
 			$line_index = 0;
 			$account = '';
+			$accountName = '';
 			$date = '';
 			$batch_number = '';
 			$batch_amount = '';
@@ -204,13 +205,14 @@ class DashboardController extends CI_Controller {
 			foreach($lines as $line) {
 
 				if($line_index == 0) {
-					$account = $line[1];
-					$date = $line[2];
+                    $accountName = $line[1];
+					$account = $line[2];
+					$date = $line[3];
 					// $batch_number = $line[3];
 					$batch_number = genBatchNumber();
-					$batch_amount = $line[4];
-					$currency = $line[5];
-					$total_records = $line[6];
+					$batch_amount = $line[5];
+					$currency = $line[6];
+					$total_records = $line[7];
 
 					if($this->BatchFiles->existBatchNumber($batch_number)) {
 						$this->output->set_status_header('400'); //Triggers the jQuery error callback
@@ -229,6 +231,7 @@ class DashboardController extends CI_Controller {
 					$batch_files_add_item = array(
 						'file_name' => $_FILES['file']['name'],
 						'batch_number' => $batch_number,
+						'ordCust_name' => $accountName,
 						'account' => $account,
 						'date' => $date,
 						'batch_amount' => $batch_amount,
@@ -316,7 +319,11 @@ class DashboardController extends CI_Controller {
 			foreach($batch_records_add_list as $batch_records_add_item) {
 				$new_batch_records_add_item = $batch_records_add_item;
 				$new_batch_records_add_item['batch_file_id'] = $batch_file_id;
-				$new_batch_records_add_item['transaction_ref'] = genTransactionRef($batch_file_id);
+			
+				//RB	$new_batch_records_add_item['transaction_ref'] = genTransactionRef($batch_file_id);
+
+			    $new_batch_records_add_item['transaction_ref'] = $batch_number.genTransactionRef($batch_file_id);
+				
 
 				$this->BatchRecords->add($new_batch_records_add_item);
 			}
@@ -371,6 +378,9 @@ class DashboardController extends CI_Controller {
 				$resp = apiBuilkUpload(array(
 					'process_type' => $this->config->item('api_process_type'),
 					'batch_number' => $batch_file['batch_number'],
+					//
+					'batch_amount' => $batch_file['batch_amount'],
+					//
 					'no_of_payment' => $batch_file['total_records'],
 					'payment_seq' => $batch_record_index,
 					'payment_seq' => $batch_record['payment_seq'],
@@ -378,10 +388,13 @@ class DashboardController extends CI_Controller {
 					'txn_ref' => $batch_record['transaction_ref'],
 					'txn_curr' => $batch_file['currency'],
 					'settlement_date' => $date->format('Y').$date->format('m').$date->format('d'),
-					'ord_cust_account' => '',
-					'ord_cust_name' => '',
+				//	'ord_cust_account' => '',
+				//	'ord_cust_name' => '',
+					'ordCustAccount' => $batch_file['account'],
+					'accountName' => $batch_file['ordCust_name'],
+				//
 					'department' => $batch_record['department'],
-					'txn_purpose' => '',
+					'txn_purpose' => 'SALA',
 					'ben_bank_bic' => $batch_record['bank_biccode'],
 					'ben_account' => $batch_record['account_number'],
 					'ben_name' => $batch_record['beneficiary_name'],
@@ -473,6 +486,7 @@ class DashboardController extends CI_Controller {
 		foreach($batch_files as $batch_file) {
 			$resp['data'][] = array(
 				$batch_file_index,
+			//	$batch_file['ordCust_name'],
 				$batch_file['account'],
 				$batch_file['date'],
 				$batch_file['batch_number'],
@@ -538,6 +552,7 @@ class DashboardController extends CI_Controller {
 		foreach($batch_files as $batch_file) {
 			$resp['data'][] = array(
 				$batch_file_index,
+			//    $batch_file['ordCust_name'],
 				$batch_file['account'],
 				$batch_file['date'],
 				$batch_file['batch_number'],
@@ -592,6 +607,7 @@ class DashboardController extends CI_Controller {
 		foreach($batch_files as $batch_file) {
 			$resp['data'][] = array(
 				$batch_file_index,
+			//	$batch_file['ordCust_name'],
 				$batch_file['account'],
 				$batch_file['date'],
 				$batch_file['batch_number'],
@@ -683,28 +699,20 @@ class DashboardController extends CI_Controller {
 
 	public function apiParticipantUpdate() {
 
-		if($this->Participants->existBicSwiftCode(isset($_POST['bic_swift_code']) ? $_POST['bic_swift_code'] : '')) {
-			echo json_encode(array(
-				'success' => false,
-				'message' => 'BIC/SWIFT Code already exists!'
-			));
-		}
-		else {
-			$this->Participants->update(array(
-				'id' => isset($_POST['participant_id']) ? $_POST['participant_id'] : '',
-				'bic_swift_code' => isset($_POST['bic_swift_code']) ? $_POST['bic_swift_code'] : '',
-				'sort_code' => isset($_POST['sort_code']) ? $_POST['sort_code'] : '',
-				'account_number' => isset($_POST['account_number']) ? $_POST['account_number'] : '',
-				'short_name' => isset($_POST['short_name']) ? $_POST['short_name'] : '',
-				'participant_name' => isset($_POST['participant_name']) ? $_POST['participant_name'] : '',
-				'account_number' => isset($_POST['account_number']) ? $_POST['account_number'] : '',
-				'status' => isset($_POST['status']) ? $_POST['status'] : ''
-			));
+		$this->Participants->update(array(
+			'id' => isset($_POST['participant_id']) ? $_POST['participant_id'] : '',
+			'bic_swift_code' => isset($_POST['bic_swift_code']) ? $_POST['bic_swift_code'] : '',
+			'sort_code' => isset($_POST['sort_code']) ? $_POST['sort_code'] : '',
+			'account_number' => isset($_POST['account_number']) ? $_POST['account_number'] : '',
+			'short_name' => isset($_POST['short_name']) ? $_POST['short_name'] : '',
+			'participant_name' => isset($_POST['participant_name']) ? $_POST['participant_name'] : '',
+			'account_number' => isset($_POST['account_number']) ? $_POST['account_number'] : '',
+			'status' => isset($_POST['status']) ? $_POST['status'] : ''
+		));
 
-			echo json_encode(array(
-				'success' => true
-			));
-		}
+		echo json_encode(array(
+			'success' => true
+		));
 	}
 
 	public function apiParticipantDelete() {
@@ -940,9 +948,10 @@ class DashboardController extends CI_Controller {
 
 		if(isset($_POST['email'])) {
 			// $url = base_url('/login');
+			$appUrl = base_url('/login');
 			$username = isset($_POST['user_name']) ? $_POST['user_name'] : '';
 			$password = $this->config->item('user_password_default');
-			sendMail($_POST['email'], 'Added User', 'User added<br>username:'.$username."<br>password:".$password);
+			sendMail($_POST['email'], 'PayConnect New User', 'Welcome to PayConnect<br> Your New Profile has been Added. Please login with below credentials:<br>    Username: '.$username."<br>    Password:".$password.'<br>    Login Link<br><a href="'.$appUrl.'">'.$appUrl."</a>");
 		}
 
 		echo json_encode(array(

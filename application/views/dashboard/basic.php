@@ -141,10 +141,10 @@
 		</div>
 		<!-- /.content-wrapper -->
 		<footer class="main-footer">
-			<strong>Copyright &copy; 2022 <a href="https://adminlte.io">CBSConnect</a>.</strong>
+			<strong>Copyright &copy; 2022 <a href="https://centralbank.gov.so/">PayConnect</a>.</strong>
 
 			<div class="float-right d-none d-sm-inline-block">
-				Powered By <a href="">JETHRO LTD</a>
+				Powered By <a href="https://jethroltd/">JETHRO</a>
 			</div>
 		</footer>
 
@@ -179,7 +179,7 @@
 			}
 			function resetTimer() {
 				clearTimeout(time);
-				// time = setTimeout(logout, 1000 * 60 * 5); // 5mins
+				time = setTimeout(logout, 1000 * 60 * 5); // 5mins
 			}
 		};
 		inactivityTime();

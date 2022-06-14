@@ -150,8 +150,8 @@ class PageController extends CI_Controller {
 			
 			$reset_page_link = base_url('/reset-password')."/".$reset_token;
 
-			sendMail($this->input->post('email'), 'Reset password', 'this is reset link<br><a href="'.$reset_page_link.'">'.$reset_page_link."</a>");
-			$this->session->set_flashdata('success', 'reset password link sent');
+			sendMail($this->input->post('email'), 'PayConnect Reset password', 'Password Reset link<br><a href="'.$reset_page_link.'">'.$reset_page_link."</a>");
+			$this->session->set_flashdata('success', 'Password Reset link sent');
 			redirect(base_url('/recovery-password'));
 
 			return;
@@ -247,15 +247,15 @@ class PageController extends CI_Controller {
 		if($_SESSION['user']['role'] == 1) {
 			// Admin
 			$data['batch_files'] = array(
-				'processed' => count($this->BatchFiles->allByStatus('processed')),
-				'pending' => count($this->BatchFiles->allByStatus('uploaded')),
+				'processed' => count($this->BatchFiles->all()) - count($this->BatchFiles->allByStatus('uploaded')) - count($this->BatchFiles->allByStatus('authorised')) - count($this->BatchFiles->allByStatus('submitted')),
+				'pending' => count($this->BatchFiles->allByStatus('authorised')),
 				'total' => count($this->BatchFiles->all()),
 			);
 		}
 		else {
 			$data['batch_files'] = array(
-				'processed' => count($this->BatchFiles->allByStatus('processed')),
-				'pending' => count($this->BatchFiles->allByStatus('uploaded')),
+				'processed' => count($this->BatchFiles->all()) - count($this->BatchFiles->allByStatus('uploaded')) - count($this->BatchFiles->allByStatus('authorised')) - count($this->BatchFiles->allByStatus('submitted')),
+				'pending' => count($this->BatchFiles->allByStatus('authorised')),
 				'acked' => count($this->BatchFiles->allByStatus('submitted')),
 			);
 		}

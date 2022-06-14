@@ -31,7 +31,7 @@ Class UserActivities extends CI_Model
 		// SELECT * FROM batch_files WHERE STR_TO_DATE(date, '%m/%d/%Y') >= STR_TO_DATE('08/13/2022', '%m/%d/%Y');
 		// SELECT STR_TO_DATE(date, '%m/%d/%Y') FROM batch_files;
 
-		$query = "SELECT * FROM user_activities JOIN users ON user_activities.user_id = users.id".$query_condition;
+		$query = "SELECT * FROM user_activities JOIN users ON user_activities.user_id = users.id".$query_condition.' ORDER BY user_activities.ID DESC';
 		$query_result = $this->db->query($query)->result_array();
 		return $query_result;
 	}

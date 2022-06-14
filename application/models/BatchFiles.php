@@ -6,7 +6,7 @@ if (!defined('BASEPATH'))
 Class BatchFiles extends CI_Model
 {
 	public function add($data){
-		$query = "INSERT INTO batch_files(`file_name`, `batch_number`, `account`, `date`, `batch_amount`, `currency`, `total_records`, `status`, `upload_at`) VALUES('".$data['file_name']."', '".$data['batch_number']."', '".$data['account']."', '".$data['date']."', '".$data['batch_amount']."', '".$data['currency']."', '".$data['total_records']."', '".$data['status']."', NOW())";
+		$query = "INSERT INTO batch_files(`file_name`, `batch_number`, `account`, `ordCust_name`,`date`, `batch_amount`, `currency`, `total_records`, `status`, `upload_at`) VALUES('".$data['file_name']."', '".$data['batch_number']."', '".$data['account']."', '".$data['ordCust_name']."', '".$data['date']."', '".$data['batch_amount']."', '".$data['currency']."', '".$data['total_records']."', '".$data['status']."', NOW())";
         $this->db->query($query);
 
 		return $this->db->insert_id();
@@ -44,7 +44,7 @@ Class BatchFiles extends CI_Model
 	}
 	
 	public function all(){
-		$query = "SELECT * FROM batch_files";
+		$query = "SELECT * FROM batch_files ORDER BY `ID` DESC";
 		$query_result = $this->db->query($query)->result_array();
 		return $query_result;
 	}
@@ -55,7 +55,7 @@ Class BatchFiles extends CI_Model
 	}
 
 	public function allScheduled(){
-		$query = "SELECT * FROM batch_files WHERE LOWER(status)='submitted'";
+		$query = "SELECT * FROM batch_files WHERE LOWER(status)='submitted' ORDER BY `ID` DESC";
 		return $this->db->query($query)->result_array();
 	}
 
@@ -95,7 +95,7 @@ Class BatchFiles extends CI_Model
 		// SELECT * FROM batch_files WHERE STR_TO_DATE(date, '%m/%d/%Y') >= STR_TO_DATE('08/13/2022', '%m/%d/%Y');
 		// SELECT STR_TO_DATE(date, '%m/%d/%Y') FROM batch_files;
 
-		$query = "SELECT * FROM batch_files".$query_condition;
+		$query = "SELECT * FROM batch_files".$query_condition.' ORDER BY `ID` DESC';
 		$query_result = $this->db->query($query)->result_array();
 		return $query_result;
 	}

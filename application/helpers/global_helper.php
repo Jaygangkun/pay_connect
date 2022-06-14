@@ -222,14 +222,17 @@ if(!function_exists('apiBuilkUpload')){
 				$post_fields = json_encode(array(
 					"processType" => $data['process_type'],
 					"BatchNumber" => $data['batch_number'],
+					"BatchAmount" => $data['batch_amount'],
 					"NoOfPayment" => $data['no_of_payment'],
 					"PaymentSeq" => $data['payment_seq'],
 					"batchDate" => $data['batch_date'],
 					"txnRef" => $data['txn_ref'],
 					"txnCurr" => $data['txn_curr'],
 					"settlementDate" => $data['settlement_date'],
-					"ordCustAccount" => $data['ord_cust_account'],
-					"ordCusName" => $data['ord_cust_name'],
+				//	"ordCustAccount" => $data['ord_cust_account'],
+				//	"ordCusName" => $data['ord_cust_name'],
+					"ordCustAccount" => $data['ordCustAccount'],
+					"ordCusName" => $data['accountName'],
 					"txnPurpose" => $data['txn_purpose'],
 					"benBankBIC" => $data['ben_bank_bic'],
 					"benAccount" => $data['ben_account'],
@@ -320,24 +323,32 @@ if(!function_exists('genTransactionRef')){
 		$date = new DateTime();
 		$DDMMYYYY = $date->format('d').$date->format('m').$date->format('Y');
 		$NNNN = 1;
+		$batch_ref = null;
 
 		if($batch_file_id != null) {
 			$ci =& get_instance();
 			$ci->load->database();
-			$sql = "SELECT count(*) as total FROM batch_records WHERE `batch_file_id`='".$batch_file_id."'";
+			$sql = "SELECT count(*) as total, transaction_ref FROM batch_records WHERE `batch_file_id`='".$batch_file_id."'";
 			$q = $ci->db->query($sql);
 			if($q->num_rows() > 0)
 			{
 				foreach($q->result() as $batch_files) {
 					$NNNN = $batch_files->total + 1;
+					$batch_ref = $batch_files->transaction_ref;
 					break;
 				}
+
 			}
 		}
 
+		if($batch_ref == null) {
+			$batch_ref = genBatchNumber();
+		}
+		
 		$NNNN = str_pad($NNNN, 4, '0', STR_PAD_LEFT);
 
-		return "MOF".$DDMMYYYY.$NNNN;
+		//RB	return "MOF".$DDMMYYYY.$NNNN;
+		return $batch_ref."-".$NNNN;
 	}
 }
 

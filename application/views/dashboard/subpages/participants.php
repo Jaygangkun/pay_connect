@@ -113,10 +113,10 @@
                 <label for="status">Status</label>
                 <div class="input-group">
                   <select class="form-control" name="status" id="status">
-                    <option value="20">Active</option>
-                    <option value="21">Suspended</option>
-                    <option value="22">Insolvent</option>
-                    <option value="23">Liquidated</option>
+                    <option value="Active">Active</option>
+                    <option value="Suspended">Suspended</option>
+                    <option value="Insolvent">Insolvent</option>
+                    <option value="Liquidated">Liquidated</option>
                   </select>
                 </div>
               </div>

@@ -14,7 +14,7 @@
                                     <div class="input-group">
                                         <input type="text" name="batch_ref" id="batch_ref" class="form-control" value="<?php echo genBatchNumber()?>">
                                         <div class="input-group-append">
-                                            <button class="btn btn-default btn-ref-generate" ref-id="batch_ref">
+                                            <button class="btn btn-default" id="btn_batch_ref">
                                                 <i class="fa fa-plus"></i>
                                             </button>
                                         </div>
@@ -28,7 +28,7 @@
                                     <div class="input-group">
                                         <input type="text" name="transaction_ref" id="transaction_ref" class="form-control" value="<?php echo genTransactionRef(null)?>">
                                         <div class="input-group-append">
-                                            <button class="btn btn-default btn-ref-generate" ref-id="transaction_ref">
+                                            <button class="btn btn-default" id="btn_transaction_ref">
                                                 <i class="fa fa-plus"></i>
                                             </button>
                                         </div>
@@ -138,15 +138,29 @@
 </div>
 <!-- /.Add Modal -->
 <script>
-$(document).on('click', '.btn-ref-generate', function() {
-    var ref_id = $(this).attr('ref-id');
-    $.ajax({
-        url: base_url + 'api-ref-generate',
-        type: 'get',
-        success: function(resp) {
-            $('#' + ref_id).val(resp);
-        }
-    })
+
+function pad(num, size) {
+    num = num.toString();
+    while (num.length < size) num = "0" + num;
+    return num;
+}
+
+$(document).on('click', '#btn_transaction_ref', function() {
+    var transaction_ref_cur = $('#transaction_ref').val();
+    var transaction_ref_new = transaction_ref_cur.substring(transaction_ref_cur.length - 4);
+    transaction_ref_new = parseInt(transaction_ref_new) + 1;
+    $('#transaction_ref').val(transaction_ref_cur.substring(0, transaction_ref_cur.length - 4) + pad(transaction_ref_new, 4));
+})
+
+$(document).on('click', '#btn_batch_ref', function() {
+    var batch_ref_cur = $('#batch_ref').val();
+    var batch_ref_new = batch_ref_cur.substring(batch_ref_cur.length - 4);
+    batch_ref_new = parseInt(batch_ref_new) + 1;
+    batch_ref_new = batch_ref_cur.substring(0, batch_ref_cur.length - 4) + pad(batch_ref_new, 4);
+    $('#batch_ref').val(batch_ref_new);
+
+    $('#transaction_ref').val(batch_ref_new + '-' + pad(1, 4));
+
 })
 
 $(document).on('click', '#btn_submit', function() {
