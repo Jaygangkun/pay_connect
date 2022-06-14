@@ -24,7 +24,7 @@
     <div class="login-box">
         <!-- /.login-logo -->
         <div class="mb-1 text-right">
-            <a href="#" target="_blank">FAQ</a>
+            <a href="<?= base_url('/payconnectfaq.pdf') ?>" target="_blank">FAQ</a>
         </div>
     
         <div class="card card-outline card-primary">

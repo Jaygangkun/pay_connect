@@ -96,7 +96,7 @@
               <div class="form-group">
                 <label>Role</label>
                 <select class="form-control select2" multiple="multiple" id="role">
-                  <option value="2">SUPER</option>
+                  <option value="2">SUPERVISOR</option>
                   <option value="4">UPLOAD</option>
                   <option value="3">AUTHORISER</option>
                 </select>
@@ -129,11 +129,12 @@
           </div>
         </div>
       </div>
+      <input type="hidden" name="user_id" id="user_id">
       <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-danger" id="btn_delete">Delete</button>
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" id="btn_save">
-          <i class="fas fa-save"></i> &nbsp;&nbsp;Save
-        </button>
+        <button type="button" class="btn btn-primary" id="btn_save"><i class="fas fa-save"></i>&nbsp;&nbsp;Save</button>
+        <button type="button" class="btn btn-primary" id="btn_update"><i class="fas fa-save"></i>&nbsp;&nbsp;Update</button>
       </div>
     </div>
     <!-- /.modal-content -->
@@ -214,6 +215,55 @@ $(document).on('click', '#btn_save', function() {
   })
 })
 
+$(document).on('click', '#btn_update', function() {
+
+  $.ajax({
+    url: base_url + 'api-user-update',
+    type: 'post',
+    dataType: 'json',
+    data: {
+      user_id: $('#user_id').val(),
+      user_name: $('#user_name').val(),
+      full_name: $('#full_name').val(),
+      email: $('#email').val(),
+      role: $('#role').val(),
+      department: $('#department').val(),
+      comments: $('#comments').val(),
+    },
+    success: function(resp) {
+      if(resp.success) {
+        $('#modal_add_user').modal('toggle');
+        table_users.ajax.reload();
+      }
+      else {
+        alert(resp.message);
+      }
+    }
+  })
+})
+
+$(document).on('click', '#btn_delete', function() {
+  if(confirm('Are you sure to delete?')) {
+    $.ajax({
+      url: base_url + 'api-user-delete',
+      type: 'post',
+      dataType: 'json',
+      data: {
+        user_id: $('#user_id').val(),
+      },
+      success: function(resp) {
+        if(resp.success) {
+          $('#modal_add_user').modal('toggle');
+          table_users.ajax.reload();
+        }
+        else {
+          alert(resp.message);
+        }
+      }
+    })
+  }
+})
+
 $(document).on('click', '.btn-activate', function() {
   $.ajax({
     url: base_url + 'api-user-change-active',
@@ -262,8 +312,42 @@ $(document).on('click', '#btn_modal_add_user', function() {
   $('#modal_add_user #department').val('');
   $('#modal_add_user #comments').val('');
 
+  $('#modal_add_user #btn_delete').hide();
+  $('#modal_add_user #btn_update').hide();
+  $('#modal_add_user #btn_save').show();
+
   $('#modal_add_user').modal('toggle');
 })
+
+$('#users tbody').on('click', 'tr', function () {
+  if(event.target.className.indexOf('btn') != -1) {
+    return;
+  }
+
+  var row_data = table_users.row(this).data();
+  $('#modal_add_user #user_name').val(row_data[1]);
+  $('#modal_add_user #full_name').val(row_data[2]);
+  $('#modal_add_user #email').val(row_data[3]);
+  var roles = row_data[8];
+  if(roles.indexOf(',') != false) {
+    roles = roles.split(',');
+  }
+  else {
+    roles = [roles];
+  }
+
+  $('#modal_add_user #role').val(roles).trigger('change');
+  $('#modal_add_user #department').val(row_data[7]);
+  $('#modal_add_user #comments').val(row_data[9]);
+  $('#modal_add_user #user_id').val(row_data[10]);
+
+  $('#modal_add_user #btn_delete').show();
+  $('#modal_add_user #btn_update').show();
+  $('#modal_add_user #btn_save').hide();
+
+  $('#modal_add_user').modal('toggle');
+})
+
 
 $(document).on('keyup', '#search', function() {
   table_users.search($(this).val()).draw(false);

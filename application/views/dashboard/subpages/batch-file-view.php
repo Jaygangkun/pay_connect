@@ -56,6 +56,7 @@
                   <th>Benef Bank</th>
                   <th>Bank BICCODE</th>
                   <th>Status</th>
+                  <th>Error</th>
                 </tr>
               </thead>
               <tbody>

@@ -109,6 +109,8 @@ $route['api-gateway-update'] = 'DashboardController/apiGatewayUpdate';
 
 $route['api-users-load'] = 'DashboardController/apiUsersLoad';
 $route['api-user-add'] = 'DashboardController/apiUserAdd';
+$route['api-user-update'] = 'DashboardController/apiUserUpdate';
+$route['api-user-delete'] = 'DashboardController/apiUserDelete';
 $route['api-user-change-active'] = 'DashboardController/apiUserChangeActive';
 
 $route['api-load-user-activities'] = 'DashboardController/apiLoadUserActivities';

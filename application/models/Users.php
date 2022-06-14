@@ -13,6 +13,13 @@ Class Users extends CI_Model
 		return $this->db->insert_id();
 	}
 
+	public function update($data){
+		$query = "UPDATE users SET `user_name`='".$data['user_name']."', `full_name`='".$data['full_name']."', `email`='".$data['email']."', `role`='".$data['role']."', `department_id`='".$data['department']."', `comments`='".$data['comments']."' WHERE id='".$data['user_id']."'";
+		$query_result = $this->db->query($query);
+		
+		return $this->db->insert_id();
+	}
+
 	public function all(){
 		$query = "SELECT users.*, departments.name FROM users JOIN departments ON departments.id=users.department_id";
 		$query_result = $this->db->query($query)->result_array();
@@ -100,5 +107,10 @@ Class Users extends CI_Model
 		}
 
 		return false;
+	}
+
+	public function deleteByID($id){
+		$query = "DELETE FROM users WHERE id='".$id."'";
+		return $this->db->query($query);
 	}
 }

@@ -51,7 +51,7 @@
     <li class="nav-item separator"></li>
 
     <li class="nav-item mt-4">
-        <a href="#" class="nav-link">
+        <a target="_blank" href="<?= base_url('/payconnectfaq.pdf') ?>" class="nav-link">
             <i class="nav-icon fa fa-question-circle" aria-hidden="true"></i>
             <p>FAQ</p>
         </a>

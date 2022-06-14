@@ -205,11 +205,18 @@ class DashboardController extends CI_Controller {
 			foreach($lines as $line) {
 
 				if($line_index == 0) {
+					if(count($line) != 8) {
+						$this->output->set_status_header('400'); //Triggers the jQuery error callback
+						$this->output->set_content_type('application/json');
+						$this->output->set_output(json_encode(array('error' => 'Header Format isn\'t correct!'))); //Triggers the jQuery error callback
+						return;
+					}
+
                     $accountName = $line[1];
 					$account = $line[2];
 					$date = $line[3];
-					// $batch_number = $line[3];
-					$batch_number = genBatchNumber();
+					$batch_number = $line[4];
+					// $batch_number = genBatchNumber();
 					$batch_amount = $line[5];
 					$currency = $line[6];
 					$total_records = $line[7];
@@ -322,7 +329,7 @@ class DashboardController extends CI_Controller {
 			
 				//RB	$new_batch_records_add_item['transaction_ref'] = genTransactionRef($batch_file_id);
 
-			    $new_batch_records_add_item['transaction_ref'] = $batch_number.genTransactionRef($batch_file_id);
+			    $new_batch_records_add_item['transaction_ref'] = genTransactionRef($batch_file_id);
 				
 
 				$this->BatchRecords->add($new_batch_records_add_item);
@@ -534,7 +541,8 @@ class DashboardController extends CI_Controller {
 				$batch_record['department'],
 				$batch_record['benef_bank'],
 				$batch_record['bank_biccode'],
-				$batch_record['resp_rcvStatus']
+				$batch_record['resp_rcvStatus'],
+				$batch_record['resp_errorMsg'],
 			);
 
 		}
@@ -909,6 +917,10 @@ class DashboardController extends CI_Controller {
 				"<span class='btn btn-danger btn-deactivate' user-id='".$user['id']."'>Deactivate</span>"
 				:
 				"<span class='btn btn-success btn-activate' user-id='".$user['id']."'>Activate</span>",
+				$user['department_id'],
+				$user['role'],
+				$user['comments'],
+				$user['id'],
 			);
 
 			$user_index++;
@@ -953,6 +965,31 @@ class DashboardController extends CI_Controller {
 			$password = $this->config->item('user_password_default');
 			sendMail($_POST['email'], 'PayConnect New User', 'Welcome to PayConnect<br> Your New Profile has been Added. Please login with below credentials:<br>    Username: '.$username."<br>    Password:".$password.'<br>    Login Link<br><a href="'.$appUrl.'">'.$appUrl."</a>");
 		}
+
+		echo json_encode(array(
+			'success' => true
+		));
+	}
+
+	public function apiUserUpdate() {
+		
+		$this->Users->update(array(
+			'user_id' => isset($_POST['user_id']) ? $_POST['user_id'] : '',
+			'user_name' => isset($_POST['user_name']) ? $_POST['user_name'] : '',
+			'full_name' => isset($_POST['full_name']) ? $_POST['full_name'] : '',
+			'email' => isset($_POST['email']) ? $_POST['email'] : '',
+			'role' => isset($_POST['role']) ? implode(',', $_POST['role']) : '',
+			'department' => isset($_POST['department']) ? $_POST['department'] : '',
+			'comments' => isset($_POST['comments']) ? $_POST['comments'] : '',
+		));
+
+		echo json_encode(array(
+			'success' => true
+		));
+	}
+
+	public function apiUserDelete() {
+		$this->Users->deleteByID(isset($_POST['user_id']) ? $_POST['user_id'] : '');
 
 		echo json_encode(array(
 			'success' => true
