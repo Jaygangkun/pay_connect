@@ -328,17 +328,28 @@ if(!function_exists('genTransactionRef')){
 		if($batch_file_id != null) {
 			$ci =& get_instance();
 			$ci->load->database();
-			$sql = "SELECT count(*) as total, transaction_ref FROM batch_records WHERE `batch_file_id`='".$batch_file_id."'";
+			$sql = "SELECT count(*) as total FROM batch_records WHERE `batch_file_id`='".$batch_file_id."'";
 			$q = $ci->db->query($sql);
 			if($q->num_rows() > 0)
 			{
 				foreach($q->result() as $batch_files) {
 					$NNNN = $batch_files->total + 1;
-					$batch_ref = $batch_files->transaction_ref;
 					break;
 				}
 
 			}
+
+			$sql = "SELECT batch_number FROM batch_files WHERE `id`='".$batch_file_id."'";
+			$q = $ci->db->query($sql);
+			if($q->num_rows() > 0)
+			{
+				foreach($q->result() as $batch_files) {
+					$batch_ref = $batch_files->batch_number;
+					break;
+				}
+
+			}
+
 		}
 
 		if($batch_ref == null) {

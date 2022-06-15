@@ -6,7 +6,7 @@ if (!defined('BASEPATH'))
 Class BatchRecords extends CI_Model
 {
 	public function add($data){
-		$query = "INSERT INTO batch_records(`batch_file_id`, `payment_seq`, `transaction_ref`, `beneficiary_name`, `account_number`, `amount_pay`, `department`, `benef_bank`, `bank_biccode`, `status`) VALUES('".$data['batch_file_id']."', '".$data['payment_seq']."', '".$data['transaction_ref']."', '".$data['beneficiary_name']."', '".$data['account_number']."', '".$data['amount_pay']."', '".$data['department']."', '".$data['benef_bank']."', '".$data['bank_biccode']."', '".$data['status']."')";
+		$query = "INSERT INTO batch_records(`batch_file_id`, `payment_seq`, `transaction_ref`, `beneficiary_name`, `account_number`, `amount_pay`, `department`, `benef_bank`, `bank_biccode`, `status`) VALUES(".$this->db->escape($data['batch_file_id']).", ".$this->db->escape($data['payment_seq']).", ".$this->db->escape($data['transaction_ref']).", ".$this->db->escape($data['beneficiary_name']).", ".$this->db->escape($data['account_number']).", ".$this->db->escape($data['amount_pay']).", ".$this->db->escape($data['department']).", ".$this->db->escape($data['benef_bank']).", ".$this->db->escape($data['bank_biccode']).", ".$this->db->escape($data['status']).")";
         $this->db->query($query);
 
 		return $this->db->insert_id();

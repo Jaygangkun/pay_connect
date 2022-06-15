@@ -6,7 +6,7 @@ if (!defined('BASEPATH'))
 Class BatchFiles extends CI_Model
 {
 	public function add($data){
-		$query = "INSERT INTO batch_files(`file_name`, `batch_number`, `account`, `ordCust_name`,`date`, `batch_amount`, `currency`, `total_records`, `status`, `upload_at`) VALUES('".$data['file_name']."', '".$data['batch_number']."', '".$data['account']."', '".$data['ordCust_name']."', '".$data['date']."', '".$data['batch_amount']."', '".$data['currency']."', '".$data['total_records']."', '".$data['status']."', NOW())";
+		$query = "INSERT INTO batch_files(`file_name`, `batch_number`, `file_batch_number`, `account`, `ordCust_name`,`date`, `batch_amount`, `currency`, `total_records`, `status`, `upload_at`) VALUES('".$data['file_name']."', '".$data['batch_number']."', '".$data['file_batch_number']."', '".$data['account']."', '".$data['ordCust_name']."', '".$data['date']."', '".$data['batch_amount']."', '".$data['currency']."', '".$data['total_records']."', '".$data['status']."', NOW())";
         $this->db->query($query);
 
 		return $this->db->insert_id();
@@ -38,6 +38,14 @@ Class BatchFiles extends CI_Model
 	public function existBatchNumber($batch_number){
 		
 		$query = "SELECT * FROM batch_files WHERE batch_number='".$batch_number."'";
+
+		$query_result = $this->db->query($query)->result_array();
+		return count($query_result) > 0;
+	}
+
+	public function existFileBatchNumber($batch_number){
+		
+		$query = "SELECT * FROM batch_files WHERE file_batch_number='".$batch_number."'";
 
 		$query_result = $this->db->query($query)->result_array();
 		return count($query_result) > 0;

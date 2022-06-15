@@ -215,13 +215,13 @@ class DashboardController extends CI_Controller {
                     $accountName = $line[1];
 					$account = $line[2];
 					$date = $line[3];
-					$batch_number = $line[4];
-					// $batch_number = genBatchNumber();
+					$file_batch_number = $line[4];
+					$batch_number = genBatchNumber();
 					$batch_amount = $line[5];
 					$currency = $line[6];
 					$total_records = $line[7];
 
-					if($this->BatchFiles->existBatchNumber($batch_number)) {
+					if($this->BatchFiles->existFileBatchNumber($file_batch_number)) {
 						$this->output->set_status_header('400'); //Triggers the jQuery error callback
 						$this->output->set_content_type('application/json');
 						$this->output->set_output(json_encode(array('error' => 'Batch number already exists!'))); //Triggers the jQuery error callback
@@ -238,6 +238,7 @@ class DashboardController extends CI_Controller {
 					$batch_files_add_item = array(
 						'file_name' => $_FILES['file']['name'],
 						'batch_number' => $batch_number,
+						'file_batch_number' => $file_batch_number,
 						'ordCust_name' => $accountName,
 						'account' => $account,
 						'date' => $date,
