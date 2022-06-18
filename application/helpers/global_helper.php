@@ -86,13 +86,25 @@ if(!function_exists('refGenerate')){
 }
 
 if(!function_exists('roleName')){
-    function roleName($role){
-		switch($role) {
-			case '1': return 'Admin';
-			case '2': return 'Supervisor';
-			case '3': return 'Authoriser';
-			case '4': return 'Uploader';
+    function roleName($roles, $role_id){
+		foreach($roles as $role) {
+			if($role['id'] == $role_id) {
+				return $role['name'];
+			}
 		}
+		return $role_id;
+	}
+}
+
+if(!function_exists('isAdmin')){
+    function isAdmin($roles_str){
+		$roles = explode(',', $roles_str);
+		foreach($roles as $role) {
+			if($role == 1) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
 
@@ -220,28 +232,12 @@ if(!function_exists('apiBuilkUpload')){
 				$curl = curl_init();
 		
 				$post_fields = json_encode(array(
-					"processType" => $data['process_type'],
-					"BatchNumber" => $data['batch_number'],
-					"BatchAmount" => $data['batch_amount'],
-					"NoOfPayment" => $data['no_of_payment'],
-					"PaymentSeq" => $data['payment_seq'],
-					"batchDate" => $data['batch_date'],
-					"txnRef" => $data['txn_ref'],
-					"txnCurr" => $data['txn_curr'],
-					"settlementDate" => $data['settlement_date'],
-				//	"ordCustAccount" => $data['ord_cust_account'],
-				//	"ordCusName" => $data['ord_cust_name'],
-					"ordCustAccount" => $data['ordCustAccount'],
-					"ordCusName" => $data['accountName'],
-					"txnPurpose" => $data['txn_purpose'],
-					"benBankBIC" => $data['ben_bank_bic'],
-					"benAccount" => $data['ben_account'],
-					"benName" => $data['ben_name'],
-					"benCrAmount" => $data['ben_cr_amount'],
-					"batchInputter" => $data['batch_inputter'],
-					"batchAuthoriser" => $data['batch_authoriser'],
-					"processDate" => $data['process_date'],
-					"processTime" => $data['process_time']
+					"processType" => $data['processType'],
+					"BatchNumber" => $data['BatchNumber'],
+					"BatchAmount" => $data['BatchAmount'],
+					"NoOfPayment" => $data['NoOfPayment'],
+					"batchDate" => $data['batchDate'],
+					"txnReferences" => $data['txnReferences']
 				));
 				// $post_fields = str_replace('\"', '"', $post_fields);
 		

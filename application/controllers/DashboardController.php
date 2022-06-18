@@ -15,6 +15,8 @@ class DashboardController extends CI_Controller {
 		$this->load->model("Users");
 		$this->load->model("UserActivities");
 		$this->load->model("Departments");
+		$this->load->model("UserRoles");
+		$this->load->model("TxnPurpose");
 
 		$this->load->library('mailer');
 	}
@@ -27,6 +29,7 @@ class DashboardController extends CI_Controller {
 		$data = array();
 		$data['title'] = 'File Upload';
 		$data['sub_page'] = 'file-upload';
+		$data['txn_purpose'] = $this->TxnPurpose->all();
 
 		$this->load->view('dashboard/basic', $data);
 	}
@@ -42,6 +45,7 @@ class DashboardController extends CI_Controller {
 
 		$data['departments'] = $this->Departments->all();
 		$data['participants'] = $this->Participants->all();
+		$data['txn_purpose'] = $this->TxnPurpose->all();
 
 		$this->load->view('dashboard/basic', $data);
 	}
@@ -143,6 +147,7 @@ class DashboardController extends CI_Controller {
 		$data['sub_page'] = 'users';
 
 		$data['departments'] = $this->Departments->all();
+		$data['user_roles'] = $this->UserRoles->all();
 
 		$this->load->view('dashboard/basic', $data);
 	}
@@ -155,6 +160,18 @@ class DashboardController extends CI_Controller {
 		$data = array();
 		$data['title'] = 'Users';
 		$data['sub_page'] = 'user-activities';
+
+		$this->load->view('dashboard/basic', $data);
+	}
+
+	public function pageTxnPurpose(){
+		if(!isset($_SESSION['user'])){
+			redirect(base_url('/login'));
+		}
+
+		$data = array();
+		$data['title'] = 'Users';
+		$data['sub_page'] = 'txn-purpose';
 
 		$this->load->view('dashboard/basic', $data);
 	}
@@ -208,7 +225,7 @@ class DashboardController extends CI_Controller {
 					if(count($line) != 8) {
 						$this->output->set_status_header('400'); //Triggers the jQuery error callback
 						$this->output->set_content_type('application/json');
-						$this->output->set_output(json_encode(array('error' => 'Header Format isn\'t correct!'))); //Triggers the jQuery error callback
+						$this->output->set_output(json_encode(array('error' => 'Header Format is wrong!'))); //Triggers the jQuery error callback
 						return;
 					}
 
@@ -237,6 +254,7 @@ class DashboardController extends CI_Controller {
 
 					$batch_files_add_item = array(
 						'file_name' => $_FILES['file']['name'],
+						'ref_id' => $batch_number,
 						'batch_number' => $batch_number,
 						'file_batch_number' => $file_batch_number,
 						'ordCust_name' => $accountName,
@@ -245,7 +263,7 @@ class DashboardController extends CI_Controller {
 						'batch_amount' => $batch_amount,
 						'currency' => $currency,
 						'total_records' => $total_records,
-						'status' => 'Uploaded',
+						'status' => 'UPLOADED',
 					);
 					$batch_total_amount = floatval($batch_amount);
 					$line_index ++;
@@ -285,6 +303,7 @@ class DashboardController extends CI_Controller {
 					'benef_bank' => $line[5],
 					'bank_biccode' => $line[6],
 					'status' => '', 
+					'uploader' => $_SESSION['user']['user_name']
 				);
 
 				$records_amount_sum += floatval($line[3]);
@@ -380,37 +399,97 @@ class DashboardController extends CI_Controller {
 			$batch_records = $this->BatchRecords->loadByBatchFileID($id);
 
 			$batch_file_submit_error = false;
-			$batch_record_index = 1;
+			$api_txn_count = 0;
+			$api_txn_data = array();
 			foreach($batch_records as $batch_record) {
-				$date = new DateTime();
-				$resp = apiBuilkUpload(array(
-					'process_type' => $this->config->item('api_process_type'),
-					'batch_number' => $batch_file['batch_number'],
-					//
-					'batch_amount' => $batch_file['batch_amount'],
-					//
-					'no_of_payment' => $batch_file['total_records'],
-					'payment_seq' => $batch_record_index,
-					'payment_seq' => $batch_record['payment_seq'],
-					'batch_date' => $batch_file['date'],
-					'txn_ref' => $batch_record['transaction_ref'],
-					'txn_curr' => $batch_file['currency'],
-					'settlement_date' => $date->format('Y').$date->format('m').$date->format('d'),
-				//	'ord_cust_account' => '',
-				//	'ord_cust_name' => '',
+				$date = new DateTime();				
+				$api_txn_data[] = array(
+					'PaymentSeq' => $batch_record['payment_seq'],
+					'txnRef' => $batch_record['transaction_ref'],
+					'txnCurr' => $batch_file['currency'],
+					'settlementDate' => $date->format('Y').$date->format('m').$date->format('d'),
 					'ordCustAccount' => $batch_file['account'],
-					'accountName' => $batch_file['ordCust_name'],
-				//
-					'department' => $batch_record['department'],
-					'txn_purpose' => 'SALA',
-					'ben_bank_bic' => $batch_record['bank_biccode'],
-					'ben_account' => $batch_record['account_number'],
-					'ben_name' => $batch_record['beneficiary_name'],
-					'ben_cr_amount' => $batch_record['amount_pay'],
-					'batch_inputter' => $this->config->item('api_batch_inputter'),
-					'batch_authoriser' => $this->config->item('api_batch_authoriser'),
-					'process_date' => $date->format('Y').$date->format('m').$date->format('d'),
-					'process_time' => $date->format('H').$date->format('i').$date->format('s')
+					'ordCusName' => $batch_file['ordCust_name'],
+					'benDepart' => $batch_record['department'],
+					'txnPurpose' => isset($_POST['purpose']) ? $_POST['purpose'] : '',
+					'benBankBIC' => $batch_record['bank_biccode'],
+					'benAccount' => $batch_record['account_number'],
+					'benName' => $batch_record['beneficiary_name'],
+					'benCrAmount' => $batch_record['amount_pay'],
+					'batchInputter' => $batch_record['uploader'],
+					'batchAuthoriser' => $batch_record['authoriser'],
+					'processDate' => $date->format('Y').$date->format('m').$date->format('d'),
+					'processTime' => $date->format('H').$date->format('i').$date->format('s')
+				);
+
+				$api_txn_count++;
+				if($api_txn_count == $this->config->item('api_txn_limit')) {
+					
+					$resp = apiBuilkUpload(array(
+						'processType' => $this->config->item('api_process_type'),
+						'BatchNumber' => $batch_file['batch_number'],
+						'BatchAmount' => $batch_file['batch_amount'],
+						'NoOfPayment' => $batch_file['total_records'],
+						'batchDate' => $date->format('Y').$date->format('m').$date->format('d'),
+						'txnReferences' => $api_txn_data
+					));
+
+					if(isset($resp['server_error']) && $resp['server_error']) {
+						echo json_encode(array(
+							'success' => false,
+							'message' => $resp['error_message']
+						));
+						return;
+					}
+	
+					if(isset($resp['error'])) {
+						echo json_encode(array(
+							'success' => false,
+							'message' => $resp['error'].' '.$resp['path']
+						));
+						return;
+					}
+
+					// if($resp['statusCode'] == '77') {
+					// 	$batch_file_submit_error = true;
+					// }
+
+					if(isset($resp['txnReferences'])) {
+						foreach($resp['txnReferences'] as $txn_reference) {
+							$this->BatchRecords->updateApiResult(array(
+								'PaymentSeq' => $txn_reference['PaymentSeq'],
+								'txnRef' => $txn_reference['txnRef'],
+								'txn_purpose' => isset($_POST['purpose']) ? $_POST['purpose'] : '',
+								'rcvStatus' => $txn_reference['rcvStatus'],
+								'statusCode' => $txn_reference['statusCode'],
+								'errorMsg' => $txn_reference['errorMsg'],
+							));
+						}
+					}
+					else {
+						echo json_encode(array(
+							'success' => false,
+							'message' => 'No get Response from API'
+						));
+						return;
+					}
+	
+					$api_txn_count = 0;
+					$api_txn_data = array();
+					continue;
+				}
+
+				
+			}
+
+			if(count($api_txn_data) > 0) {
+				$resp = apiBuilkUpload(array(
+					'processType' => $this->config->item('api_process_type'),
+					'BatchNumber' => $batch_file['batch_number'],
+					'BatchAmount' => $batch_file['batch_amount'],
+					'NoOfPayment' => $batch_file['total_records'],
+					'batchDate' => $date->format('Y').$date->format('m').$date->format('d'),
+					'txnReferences' => $api_txn_data
 				));
 
 				if(isset($resp['server_error']) && $resp['server_error']) {
@@ -421,24 +500,34 @@ class DashboardController extends CI_Controller {
 					return;
 				}
 
-				if($resp['statusCode'] == '77') {
-					$batch_file_submit_error = true;
+				if(isset($resp['error'])) {
+					echo json_encode(array(
+						'success' => false,
+						'message' => $resp['error'].' '.$resp['path']
+					));
+					return;
 				}
 
-				$this->BatchRecords->updateApiResult(array(
-					'id' => $batch_record['id'],
-					'status' => $resp['statusCode'] == '77' ? 2 : 1,
-					'resp_rcvStatus' => $resp['rcvStatus'],
-					'resp_errorMsg' => $resp['errorMsg']
-				));
-
-				$batch_record_index++;
+				if(isset($resp['txnReferences'])) {
+					foreach($resp['txnReferences'] as $txn_reference) {
+						$this->BatchRecords->updateApiResult(array(
+							'PaymentSeq' => $txn_reference['PaymentSeq'],
+							'txnRef' => $txn_reference['txnRef'],
+							'txn_purpose' => isset($_POST['purpose']) ? $_POST['purpose'] : '',
+							'rcvStatus' => $txn_reference['rcvStatus'],
+							'statusCode' => $txn_reference['statusCode'],
+							'errorMsg' => $txn_reference['errorMsg'],
+						));
+					}
+				}
+				else {
+					echo json_encode(array(
+						'success' => false,
+						'message' => 'No get Response from API'
+					));
+					return;
+				}
 			}
-
-			// $this->BatchFiles->updateSubmitResult(array(
-			// 	'id' => $batch_file['id'],
-			// 	'status' => $batch_file_submit_error ? 'Error' : 'Submitted',
-			// ));
 
 			$this->BatchFiles->updateStatus($id, 'SUBMITTED');
 
@@ -464,7 +553,7 @@ class DashboardController extends CI_Controller {
 		$id = isset($_POST['id']) ? $_POST['id'] : null;
 		if($id) {
 			$this->BatchFiles->updateStatus($id, 'AUTHORISED');
-			$this->BatchRecords->updateStatusByBatchFile($id, 'AUTHORISED');
+			$this->BatchRecords->updateAuthoriseByBatchFile($id, $_SESSION['user']['user_name'], 'AUTHORISED');
 
 			$this->UserActivities->add(array(
 				'user_id' => $_SESSION['user']['id'],
@@ -637,10 +726,13 @@ class DashboardController extends CI_Controller {
 		$batch_ref = isset($_POST['batch_ref']) ? $_POST['batch_ref'] : '';
 		$transaction_ref = isset($_POST['transaction_ref']) ? $_POST['transaction_ref'] : '';
 		$account_number = isset($_POST['account_number']) ? $_POST['account_number'] : '';
+		$ordering_account = isset($_POST['ordering_account']) ? $_POST['ordering_account'] : '';
+		$ordering_customer = isset($_POST['ordering_customer']) ? $_POST['ordering_customer'] : '';
 		$beneficiary_name = isset($_POST['beneficiary_name']) ? $_POST['beneficiary_name'] : '';
 		$department = isset($_POST['department']) ? $_POST['department'] : '';
 		$benef_bank = isset($_POST['benef_bank']) ? $_POST['benef_bank'] : '';
 		$bank_biccode = isset($_POST['bank_biccode']) ? $_POST['bank_biccode'] : '';
+		$txn_purpose = isset($_POST['txn_purpose']) ? $_POST['txn_purpose'] : '';
 		$amount_pay = isset($_POST['amount_pay']) ? $_POST['amount_pay'] : '';
 
 		if($batch_ref == '') {
@@ -664,12 +756,16 @@ class DashboardController extends CI_Controller {
 			'department' => $department,
 			'benef_bank' => $benef_bank,
 			'bank_biccode' => $bank_biccode,
+			'txn_purpose' => $txn_purpose,
 			'status' => '1', 
+			'uploader' => $_SESSION['user']['user_name']
 		));
 
 		$date = new DateTime();
 		$this->BatchFiles->manualSubmit(array(
 			'id' => $batch_file_id,
+			'account' => $ordering_account,
+			'ordCust_name' => $ordering_customer,
 			'batch_amount' => $amount_pay == '' ? 0 : $amount_pay,
 			'currency' => 'USD',
 			'total_records' => $payment_seq,
@@ -898,13 +994,14 @@ class DashboardController extends CI_Controller {
 		);
 
 		$users = $this->Users->all();
+		$user_roles = $this->UserRoles->all();
 		$user_index = 1;
 
 		foreach($users as $user) {
 			$roles = explode(',', $user['role']);
 			$role_html = '';
 			foreach($roles as $role) {
-				$role_html .= '<span class="badge badge-success text-uppercase mr-1">'.roleName($role).'</span>';
+				$role_html .= '<span class="badge badge-success text-uppercase mr-1">'.roleName($user_roles, $role).'</span>';
 			}
 			
 			$resp['data'][] = array(
@@ -914,14 +1011,15 @@ class DashboardController extends CI_Controller {
 				$user['email'],
 				$user['name'],
 				$role_html,
-				strtolower($user['status']) == 'active' ? 
+				isAdmin($user['role']) ? "" : (strtolower($user['status']) == 'active' ? 
 				"<span class='btn btn-danger btn-deactivate' user-id='".$user['id']."'>Deactivate</span>"
 				:
-				"<span class='btn btn-success btn-activate' user-id='".$user['id']."'>Activate</span>",
+				"<span class='btn btn-success btn-activate' user-id='".$user['id']."'>Activate</span>"),
 				$user['department_id'],
 				$user['role'],
 				$user['comments'],
 				$user['id'],
+				isAdmin($user['role'])
 			);
 
 			$user_index++;
@@ -1064,6 +1162,26 @@ class DashboardController extends CI_Controller {
 		));
 	}
 
+	public function apiUserRoleAdd() {
+		$role_id = $this->UserRoles->add(array(
+			'name' => isset($_POST['name']) ? $_POST['name'] : ''
+		));
+
+		$user_roles = $this->UserRoles->all();
+		$html = '';
+		foreach($user_roles as $user_role) {
+			$html .= '<option value="'.$user_role['id'].'">'.strtoupper($user_role['name']).'</option>';
+		}
+
+		$html .= '<option value="-1">OTHERS</option>';
+
+		echo json_encode(array(
+			'success' => true,
+			'html' => $html
+		));
+	}
+
+
 	public function apiAutoLogout() {
 		if(isset($_POST['user_id'])) {
 			$this->UserActivities->add(array(
@@ -1080,5 +1198,47 @@ class DashboardController extends CI_Controller {
 				'success' => false
 			));
 		}
+	}
+	
+	public function apiTxnPurposeLoad() {
+		$resp = array(
+			'data' => []
+		);
+
+		$txn_purpose = $this->TxnPurpose->all();
+
+		$txn_purpose_index = 1;
+		foreach($txn_purpose as $purpose) {
+			$resp['data'][] = array(
+				$txn_purpose_index,
+				$purpose['code'],
+				$purpose['description'],
+				"<span class='btn btn-danger btn-delete' txn-purpose-id='".$purpose['id']."'>Delete</span>",
+			);
+
+			$txn_purpose_index++;
+		}
+
+		echo json_encode($resp);
+	}
+
+	public function apiTxnPurposeAdd() {
+
+		$this->TxnPurpose->add(array(
+			'code' => isset($_POST['code']) ? $_POST['code'] : '',
+			'description' => isset($_POST['description']) ? $_POST['description'] : '',
+		));
+
+		echo json_encode(array(
+			'success' => true
+		));
+	}
+
+	public function apiTxnPurposeDelete() {
+		$this->TxnPurpose->deleteByID(isset($_POST['txn_purpose_id']) ? $_POST['txn_purpose_id'] : '');
+
+		echo json_encode(array(
+			'success' => true
+		));
 	}
 }

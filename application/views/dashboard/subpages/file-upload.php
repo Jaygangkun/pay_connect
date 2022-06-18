@@ -74,6 +74,20 @@
     <div class="card card-primary" id="card2">
       <div class="card-body">
         <div class="row mt-4">
+          <div class="col-md-3">
+            <select class="form-control" id="txn_purpose">
+              <option value="-1">Select Purpose</option>
+              <?php
+              foreach($txn_purpose as $purpose) {
+                ?>
+                <option value="<?php echo $purpose['code']?>"><?php echo $purpose['code']?></option>
+                <?php
+              }
+              ?>
+            </select>
+          </div>
+        </div>
+        <div class="row mt-2">
           <div class="col-md-12">
             <table id="batch_files" class="table table-bordered table-striped">
               <thead>
@@ -120,12 +134,15 @@
 
   myDropzone.on("addedfile", function(file) {
     // Hookup the start button
-    file.previewElement.querySelector(".start").onclick = function() { myDropzone.enqueueFile(file) }
+    file.previewElement.querySelector(".start").onclick = function() { 
+      myDropzone.enqueueFile(file) 
+      processing = true;
+    }
   })
 
   myDropzone.on("success", function(file, message) {
     console.log("success", message);
-
+    processing = false;
     for (let node of file.previewElement.querySelectorAll(
         "[data-dz-successmessage]"
     )) {
@@ -137,6 +154,7 @@
 
   myDropzone.on("error", function(file, message) {
     console.log("error", file, message);
+    processing = false;
     if (file.previewElement) {
       file.previewElement.classList.add("dz-error");
       if (typeof message !== "string" && message.error) {
@@ -174,18 +192,27 @@
         alert('Batch need to authorise');
         return;
       }
+
+      if($('#txn_purpose').val() == '-1') {
+        alert('Please select purpose');
+        $('#txn_purpose').focus();
+        return;
+      }
       var btn_group_wrap = $(this).parents('.btn-group-wrap');
       $(btn_group_wrap).addClass('loading');
       $(btn_group_wrap).find('.btn').addClass('disabled');
-      
+      processing = true;
       $.ajax({
         url: base_url + 'api-submit-batch-file',
         type: 'post',
         dataType: 'json',
         data: {
-          id: $(this).attr('data-id')
+          id: $(this).attr('data-id'),
+          purpose: $('#txn_purpose').val()
         },
         success: function(resp) {
+          processing = false;
+
           $(btn_group_wrap).removeClass('loading');
           $(btn_group_wrap).find('.btn').removeClass('disabled');
           if(resp.success) {
@@ -220,6 +247,8 @@
       var btn_group_wrap = $(this).parents('.btn-group-wrap');
       $(btn_group_wrap).addClass('loading');
       $(btn_group_wrap).find('.btn').addClass('disabled');
+
+      processing = true;
       $.ajax({
         url: base_url + 'api-authorise-batch-file',
         type: 'post',
@@ -228,6 +257,8 @@
           id: $(this).attr('data-id')
         },
         success: function(resp) {
+          processing = false;
+
           $(btn_group_wrap).removeClass('loading');
           $(btn_group_wrap).find('.btn').removeClass('disabled');
           if(resp.success) {
@@ -259,6 +290,7 @@
     }
     else {
       if(confirm('Are you sure to delete?')) {
+        processing = true;
         $.ajax({
           url: base_url + "api-delete-batch-file",
           type: 'post',
@@ -267,6 +299,7 @@
             id: $(this).attr('data-id')
           },
           success: function(resp) {
+            processing = false;
             if(resp.success) {
               table_batch_files.ajax.reload();
             }

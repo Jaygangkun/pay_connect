@@ -75,6 +75,7 @@ $route['email-server'] = 'DashboardController/pageEmailServer';
 $route['api-gateways'] = 'DashboardController/pageAPIGateways';
 $route['users'] = 'DashboardController/pageUsers';
 $route['user-activities'] = 'DashboardController/pageUserActivities';
+$route['txn-purpose'] = 'DashboardController/pageTxnPurpose';
 
 // global apis
 $route['api-transaction-generate'] = 'APIController/transactionGenerate';
@@ -107,6 +108,10 @@ $route['api-gateway-add'] = 'DashboardController/apiGatewayAdd';
 $route['api-gateway-delete'] = 'DashboardController/apiGatewayDelete';
 $route['api-gateway-update'] = 'DashboardController/apiGatewayUpdate';
 
+$route['api-txn-purpose-load'] = 'DashboardController/apiTxnPurposeLoad';
+$route['api-txn-purpose-add'] = 'DashboardController/apiTxnPurposeAdd';
+$route['api-txn-purpose-delete'] = 'DashboardController/apiTxnPurposeDelete';
+
 $route['api-users-load'] = 'DashboardController/apiUsersLoad';
 $route['api-user-add'] = 'DashboardController/apiUserAdd';
 $route['api-user-update'] = 'DashboardController/apiUserUpdate';
@@ -116,6 +121,8 @@ $route['api-user-change-active'] = 'DashboardController/apiUserChangeActive';
 $route['api-load-user-activities'] = 'DashboardController/apiLoadUserActivities';
 
 $route['api-department-add'] = 'DashboardController/apiDepartmentAdd';
+
+$route['api-user-role-add'] = 'DashboardController/apiUserRoleAdd';
 
 $route['api-auto-logout'] = 'DashboardController/apiAutoLogout';
 // Global APIS

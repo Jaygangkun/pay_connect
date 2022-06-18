@@ -96,9 +96,14 @@
               <div class="form-group">
                 <label>Role</label>
                 <select class="form-control select2" multiple="multiple" id="role">
-                  <option value="2">SUPERVISOR</option>
-                  <option value="4">UPLOAD</option>
-                  <option value="3">AUTHORISER</option>
+                  <?php
+                  foreach($user_roles as $role) {
+                    ?>
+                    <option value="<?php echo $role['id']?>"><?php echo strtoupper($role['name'])?></option>
+                    <?php
+                  }
+                  ?>
+                  <option value="-1">OTHERS</option>
                 </select>
               </div>
             </div>
@@ -168,13 +173,49 @@
 </div>
 <!-- /.Add Department Modal -->
 
+<!-- Add User Role Modal -->
+<div class="modal fade" id="modal_add_user_role" data-backdrop="static" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="form-group">
+            <label>Role Name</label>
+            <input type="text" class="form-control" placeholder="" id="role_name"/>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Discard</button>
+        <button type="button" class="btn btn-primary" id="btn_user_role_save">
+          <i class="fas fa-save"></i> &nbsp;&nbsp;Save
+        </button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.Add User Role Modal -->
+
 <style>
 #users_wrapper .row:first-of-type {
   display: none;
 }
 </style>
 <script>
-$('.select2').select2();
+$('#modal_add_user #role').select2();
+$('#modal_add_user #role').on('select2:select', function(e) {
+  console.log('select:', e.params.data, $('#role').val());
+  if(e.params.data.id == '-1') {
+    var roles = $('#modal_add_user #role').val();
+    roles = roles.filter(function(e) { return e != -1});
+    $('#modal_add_user #role').val(roles).trigger('change');
+
+    $('#modal_add_user_role').modal('toggle');
+  }
+});
+
 var table_users = $('#users').DataTable({
   "pagingType": 'full_numbers',
   "paging": true,
@@ -205,14 +246,19 @@ $(document).on('click', '#btn_save', function() {
     },
     success: function(resp) {
       if(resp.success) {
-        $('#modal_add_user').modal('toggle');
-        table_users.ajax.reload();
+        // $('#modal_add_user').modal('toggle');
+        // table_users.ajax.reload();
       }
       else {
         alert(resp.message);
       }
     }
   })
+
+  setTimeout(function(){
+    $('#modal_add_user').modal('toggle');
+    table_users.ajax.reload();
+  }, 2000);
 })
 
 $(document).on('click', '#btn_update', function() {
@@ -325,6 +371,10 @@ $('#users tbody').on('click', 'tr', function () {
   }
 
   var row_data = table_users.row(this).data();
+  if(row_data[11]) {
+    // is admin
+    return;
+  }
   $('#modal_add_user #user_name').val(row_data[1]);
   $('#modal_add_user #full_name').val(row_data[2]);
   $('#modal_add_user #email').val(row_data[3]);
@@ -377,6 +427,41 @@ $(document).on('click', '#btn_department_save', function() {
       if(resp.success) {
         $('#modal_add_department').modal('toggle');
         $('#department').html(resp.html);
+
+        $('#department_name').val('');
+      }
+      else {
+        alert(resp.message);
+      }
+    }
+  })
+})
+
+$(document).on('click', '#btn_user_role_save', function() {
+  if($('#role_name').val() == '') {
+    alert('Please input user role name');
+    $('#role_name').focus();
+    return;
+  }
+
+  $.ajax({
+    url: base_url + 'api-user-role-add',
+    type: 'post',
+    dataType: 'json',
+    data: {
+      name: $('#role_name').val(),
+    },
+    success: function(resp) {
+      if(resp.success) {
+        $('#modal_add_user_role').modal('toggle');
+        // $('#modal_add_user #role').append(new Option($('#role_name').val(), resp.role_id, true, true));
+        var roles = $('#modal_add_user #role').val();
+        $('#modal_add_user #role').select2("destroy");
+        $('#role').html(resp.html);
+        $('#modal_add_user #role').select2();
+        $('#modal_add_user #role').val(roles).trigger('change');
+
+        $('#role_name').val('');
       }
       else {
         alert(resp.message);

@@ -41,6 +41,23 @@
                             <div class="col-sm-1"></div>
                             <div class="col-sm-4">
                                 <div class="form-group">
+                                    <label for="ordering_account">Ordering Account</label>
+                                    <input type="text" name="ordering_account" id="ordering_account" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="ordering_customer">Ordering Customer</label>
+                                    <input type="text" name="ordering_customer" id="ordering_customer" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-sm-1"></div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
                                     <label for="account_number">Beneficiary Account Number</label>
                                     <input type="text" name="account_number" id="account_number" class="form-control">
                                 </div>
@@ -91,11 +108,26 @@
                             <div class="col-sm-1"></div>
                             <div class="col-sm-4">
                                 <div class="form-group">
+                                    <label for="purpose">Transaction Purpose</label>
+                                    <select class="form-control" id="purpose" name="purpose">
+                                        <option value="">Select Purpose</option>
+                                        <?php
+                                        foreach($txn_purpose as $purpose) {
+                                            ?>
+                                            <option value="<?php echo $purpose['code']?>"><?php echo $purpose['code']?></option>
+                                            <?php
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
                                     <label for="amount_pay">Amount to Pay</label>
                                     <input type="text" name="amount_pay" id="amount_pay" class="form-control">
                                 </div>
                             </div>
-                            <div class="col-sm-2"></div>
                         </div>
 
                         <div class="row mt-4">
@@ -164,6 +196,7 @@ $(document).on('click', '#btn_batch_ref', function() {
 })
 
 $(document).on('click', '#btn_submit', function() {
+    processing = true;
     $.ajax({
         url: base_url + 'api-upload-manual',
         type: 'post',
@@ -172,13 +205,17 @@ $(document).on('click', '#btn_submit', function() {
             batch_ref: $('#batch_ref').val(),
             transaction_ref: $('#transaction_ref').val(),
             account_number: $('#account_number').val(),
+            ordering_account: $('#ordering_account').val(),
+            ordering_customer: $('#ordering_customer').val(),
             beneficiary_name: $('#beneficiary_name').val(),
             department: $('#department option:selected').text(),
             benef_bank: $('#benef_bank option:selected').text(),
             bank_biccode: $('#benef_bank').val(),
+            txn_purpose: $('#purpose').val(),
             amount_pay: $('#amount_pay').val(),
         },
         success: function(resp) {
+            processing = false;
             if(resp.success) {
                 $('#modal_add_more').modal('toggle');
             }

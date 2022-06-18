@@ -25,7 +25,7 @@
 
     <li class="nav-item separator"></li>
 
-    <li class="nav-item <?php echo isset($sub_page) && ($sub_page == 'email-server' || $sub_page == 'api-gateways') ? 'menu-is-opening menu-open' : '' ?>">
+    <li class="nav-item <?php echo isset($sub_page) && ($sub_page == 'email-server' || $sub_page == 'api-gateways' || $sub_page == 'txn-purpose') ? 'menu-is-opening menu-open' : '' ?>">
         <a href="#" class="nav-link <?php echo isset($sub_page) && ($sub_page == 'email-server' || $sub_page == 'api-gateways') ? 'active' : '' ?>">
             <i class="nav-icon fas fa-cogs" aria-hidden="true"></i>              
             <p>System Settings <i class="fas fa-angle-left right"></i></p>
@@ -41,6 +41,12 @@
             <a href="<?= base_url('/api-gateways') ?>" class="nav-link <?php echo isset($sub_page) && $sub_page == 'api-gateways' ? 'active' : '' ?>">
                 <i class="nav-icon fas fa-inbox"></i>
                 <p>API Gateway</p>
+            </a>
+            </li>
+            <li class="nav-item">
+            <a href="<?= base_url('/txn-purpose') ?>" class="nav-link <?php echo isset($sub_page) && $sub_page == 'txn-purpose' ? 'active' : '' ?>">
+                <i class="nav-icon fas fa-inbox"></i>
+                <p>Txn Purpose</p>
             </a>
             </li>
         </ul>

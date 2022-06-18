@@ -211,10 +211,21 @@ class PageController extends CI_Controller {
 				// $this->load->view('auth/reset-password',$data);
 			}
 			if($this->input->post('password') != $this->input->post('re_password')) {
-				$this->session->set_flashdata('warning','Please use same fields');
+				$this->session->set_flashdata('warning','Please use same value');
 				redirect(base_url('/reset-password').'/'.$reset_token);
 				// $data['reset_token'] = $reset_token;
 				// $this->load->view('auth/reset-password',$data);
+			}
+
+
+			$uppercase = preg_match('@[A-Z]@', $this->input->post('password'));
+			$lowercase = preg_match('@[a-z]@', $this->input->post('password'));
+			$number = preg_match('@[0-9]@', $this->input->post('password'));
+			$specialChars = preg_match('@[^\w]@', $this->input->post('password'));
+
+			if(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($this->input->post('password')) < 8) {
+				$this->session->set_flashdata('warning','Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.');
+				redirect(base_url('/reset-password').'/'.$reset_token);
 			}
 
 			$this->Users->resetPassword($reset_token, $this->input->post('password'));

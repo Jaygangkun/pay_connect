@@ -6,7 +6,13 @@ if (!defined('BASEPATH'))
 Class BatchRecords extends CI_Model
 {
 	public function add($data){
-		$query = "INSERT INTO batch_records(`batch_file_id`, `payment_seq`, `transaction_ref`, `beneficiary_name`, `account_number`, `amount_pay`, `department`, `benef_bank`, `bank_biccode`, `status`) VALUES(".$this->db->escape($data['batch_file_id']).", ".$this->db->escape($data['payment_seq']).", ".$this->db->escape($data['transaction_ref']).", ".$this->db->escape($data['beneficiary_name']).", ".$this->db->escape($data['account_number']).", ".$this->db->escape($data['amount_pay']).", ".$this->db->escape($data['department']).", ".$this->db->escape($data['benef_bank']).", ".$this->db->escape($data['bank_biccode']).", ".$this->db->escape($data['status']).")";
+		if(isset($data['txn_purpose'])) {
+			$query = "INSERT INTO batch_records(`batch_file_id`, `payment_seq`, `transaction_ref`, `beneficiary_name`, `account_number`, `amount_pay`, `department`, `benef_bank`, `bank_biccode`, `uploader`, `txn_purpose`, `status`) VALUES(".$this->db->escape($data['batch_file_id']).", ".$this->db->escape($data['payment_seq']).", ".$this->db->escape($data['transaction_ref']).", ".$this->db->escape($data['beneficiary_name']).", ".$this->db->escape($data['account_number']).", ".$this->db->escape($data['amount_pay']).", ".$this->db->escape($data['department']).", ".$this->db->escape($data['benef_bank']).", ".$this->db->escape($data['bank_biccode']).", ".$this->db->escape($data['uploader']).", '".$data['txn_purpose']."', ".$this->db->escape($data['status']).")";
+		}
+		else {
+			$query = "INSERT INTO batch_records(`batch_file_id`, `payment_seq`, `transaction_ref`, `beneficiary_name`, `account_number`, `amount_pay`, `department`, `benef_bank`, `bank_biccode`, `uploader`, `status`) VALUES(".$this->db->escape($data['batch_file_id']).", ".$this->db->escape($data['payment_seq']).", ".$this->db->escape($data['transaction_ref']).", ".$this->db->escape($data['beneficiary_name']).", ".$this->db->escape($data['account_number']).", ".$this->db->escape($data['amount_pay']).", ".$this->db->escape($data['department']).", ".$this->db->escape($data['benef_bank']).", ".$this->db->escape($data['bank_biccode']).", ".$this->db->escape($data['uploader']).", ".$this->db->escape($data['status']).")";
+		}
+		
         $this->db->query($query);
 
 		return $this->db->insert_id();
@@ -20,7 +26,7 @@ Class BatchRecords extends CI_Model
 	}
 
 	public function updateApiResult($data) {
-		$query = "UPDATE batch_records SET status='".$data['status']."', resp_rcvStatus='".$data['resp_rcvStatus']."', resp_errorMsg='".$data['resp_errorMsg']."' WHERE id='".$data['id']."'";
+		$query = "UPDATE batch_records SET txn_purpose='".$data['txn_purpose']."', resp_statusCode='".$data['statusCode']."', resp_rcvStatus='".$data['rcvStatus']."', resp_errorMsg='".$data['errorMsg']."' WHERE payment_seq='".$data['PaymentSeq']."' AND transaction_ref='".$data['txnRef']."'";
 
         return $this->db->query($query);
 	}
@@ -38,8 +44,8 @@ Class BatchRecords extends CI_Model
         return $this->db->query($query);
 	}
 
-	public function updateStatusByBatchFile($batch_file_id, $status) {
-		$query = "UPDATE batch_records SET resp_rcvStatus='".$status."' WHERE batch_file_id='".$batch_file_id."'";
+	public function updateAuthoriseByBatchFile($batch_file_id, $authoriser, $status) {
+		$query = "UPDATE batch_records SET resp_rcvStatus='".$status."', authoriser='".$authoriser."' WHERE batch_file_id='".$batch_file_id."'";
 
         return $this->db->query($query);
 	}

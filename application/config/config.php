@@ -550,3 +550,6 @@ $config['smtp_secure'] = 'ssl';
 
 $config['mail_from'] = 'support@devwork.pro';
 $config['mail_from_name'] = 'PayConnect';
+
+// post api txn limit
+$config['api_txn_limit'] = 1000;

@@ -157,25 +157,31 @@
 	<!-- ./wrapper -->
 
 	<script>
+		var processing = false;
+		var time;
 		let inactivityTime = function () {
-			let time;
 			window.onload = resetTimer;
 			document.onmousemove = resetTimer;
 			document.onkeypress = resetTimer;
 			function logout() {
-				$.ajax({
-					url: base_url + 'api-auto-logout',
-					type: 'post',
-					dataType: 'json',
-					data: {
-						user_id: <?php echo $_SESSION['user']['id']?>
-					},
-					success: function(resp) {
-						if(!resp.success) {
-							location.reload();
+				if(!processing) {
+					$.ajax({
+						url: base_url + 'api-auto-logout',
+						type: 'post',
+						dataType: 'json',
+						data: {
+							user_id: <?php echo $_SESSION['user']['id']?>
+						},
+						success: function(resp) {
+							if(!resp.success) {
+								location.reload();
+							}
 						}
-					}
-				})
+					})
+				}
+				else {
+					time = setTimeout(logout, 1000 * 60 * 5); // 5mins
+				}
 			}
 			function resetTimer() {
 				clearTimeout(time);

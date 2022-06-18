@@ -6,7 +6,7 @@ if (!defined('BASEPATH'))
 Class BatchFiles extends CI_Model
 {
 	public function add($data){
-		$query = "INSERT INTO batch_files(`file_name`, `batch_number`, `file_batch_number`, `account`, `ordCust_name`,`date`, `batch_amount`, `currency`, `total_records`, `status`, `upload_at`) VALUES('".$data['file_name']."', '".$data['batch_number']."', '".$data['file_batch_number']."', '".$data['account']."', '".$data['ordCust_name']."', '".$data['date']."', '".$data['batch_amount']."', '".$data['currency']."', '".$data['total_records']."', '".$data['status']."', NOW())";
+		$query = "INSERT INTO batch_files(`ref_id`, `file_name`, `batch_number`, `file_batch_number`, `account`, `ordCust_name`,`date`, `batch_amount`, `currency`, `total_records`, `status`, `upload_at`) VALUES(".$this->db->escape($data['ref_id']).", ".$this->db->escape($data['file_name']).", ".$this->db->escape($data['batch_number']).", ".$this->db->escape($data['file_batch_number']).", ".$this->db->escape($data['account']).", ".$this->db->escape($data['ordCust_name']).", ".$this->db->escape($data['date']).", ".$this->db->escape($data['batch_amount']).", ".$this->db->escape($data['currency']).", ".$this->db->escape($data['total_records']).", '".$data['status']."', NOW())";
         $this->db->query($query);
 
 		return $this->db->insert_id();
@@ -21,7 +21,7 @@ Class BatchFiles extends CI_Model
 			return $query_result[0]['id'];
 		}
 		
-		$query = "INSERT INTO batch_files(`ref_id`,  `batch_number`, `batch_amount`, `status`, `submit_at`) VALUES('".$ref_id."', '".$ref_id."', '0', 'UPLOADED', NOW())";
+		$query = "INSERT INTO batch_files(`ref_id`, `batch_number`, `batch_amount`, `status`, `upload_at`, `submit_at`) VALUES('".$ref_id."', '".$ref_id."', '0', 'UPLOADED', NOW(), NOW())";
         $this->db->query($query);
 
 		return $this->db->insert_id();
@@ -127,7 +127,7 @@ Class BatchFiles extends CI_Model
 	}
 
 	public function manualSubmit($data) {
-		$query = "UPDATE batch_files SET batch_amount= cast(batch_amount AS DECIMAL(10, 2)) + cast('".$data['batch_amount']."' AS DECIMAL(10, 2)), currency='".$data['currency']."', total_records='".$data['total_records']."', status='UPLOADED', `date`='".$data['date']."' WHERE id='".$data['id']."'";
+		$query = "UPDATE batch_files SET account='".$data['account']."', ordCust_name='".$data['ordCust_name']."', batch_amount= cast(batch_amount AS DECIMAL(10, 2)) + cast('".$data['batch_amount']."' AS DECIMAL(10, 2)), currency='".$data['currency']."', total_records='".$data['total_records']."', status='UPLOADED', `date`='".$data['date']."' WHERE id='".$data['id']."'";
 
         return $this->db->query($query);
 	}
