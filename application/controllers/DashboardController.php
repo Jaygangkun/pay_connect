@@ -177,6 +177,8 @@ class DashboardController extends CI_Controller {
 	}
 
 	public function apiUpload()	 {
+		set_time_limit(0);
+		
 		$uploaddir = 'uploads/';
 		$uploadfile = $uploaddir . basename($_FILES['file']['name']);
 		

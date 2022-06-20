@@ -32,41 +32,46 @@
             </div>
           </div>
         </div>
-        <div class="table table-striped files" id="previews">
-          <div id="template" class="row mt-2">
-            <div class="col-auto">
-              <span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
-            </div>
-            <div class="col-5">
-              <p class="mb-0 mr-3">
-                <span class="lead" data-dz-name></span>
-                (<span data-dz-size></span>)
-              </p>
-              <strong class="error text-danger" data-dz-errormessage></strong>
-              <strong class="error text-success" data-dz-successmessage></strong>
-            </div>
-            <div class="col-4 d-flex align-items-center">
-              <div class="progress progress-striped active w-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress></div>
+        <div class="uploading-progress-area">
+          <div class="table table-striped files" id="previews">
+            <div id="template" class="row mt-2">
+              <div class="col-auto">
+                <span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
               </div>
-            </div>
-            <div class="col-auto d-flex align-items-center">
-              <div class="btn-group">
-                <button class="btn btn-primary start">
-                  <i class="fas fa-upload"></i>
-                  <span>Start</span>
-                </button>
-                <button data-dz-remove class="btn btn-warning cancel">
-                  <i class="fas fa-times-circle"></i>
-                  <span>Cancel</span>
-                </button>
-                <button data-dz-remove class="btn btn-danger delete">
-                  <i class="fas fa-trash"></i>
-                  <span>Delete</span>
-                </button>
+              <div class="col-5">
+                <p class="mb-0 mr-3">
+                  <span class="lead" data-dz-name></span>
+                  (<span data-dz-size></span>)
+                </p>
+                <strong class="error text-danger" data-dz-errormessage></strong>
+                <strong class="error text-success" data-dz-successmessage></strong>
+              </div>
+              <div class="col-4 d-flex align-items-center">
+                <div class="progress progress-striped active w-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                  <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress></div>
+                </div>
+              </div>
+              <div class="col-auto d-flex align-items-center">
+                <div class="btn-group">
+                  <button class="btn btn-primary start">
+                    <i class="fas fa-upload"></i>
+                    <span>Start</span>
+                  </button>
+                  <button data-dz-remove class="btn btn-warning cancel">
+                    <i class="fas fa-times-circle"></i>
+                    <span>Cancel</span>
+                  </button>
+                  <button data-dz-remove class="btn btn-danger delete">
+                    <i class="fas fa-trash"></i>
+                    <span>Delete</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
+          <div class="uploading-progress-loading-wrap">
+						<div class="uploading-progress-loader"></div>
+					</div>
         </div>
       </div>
     </div>
@@ -137,6 +142,8 @@
     file.previewElement.querySelector(".start").onclick = function() { 
       myDropzone.enqueueFile(file) 
       processing = true;
+
+      $('.uploading-progress-area').addClass('uploading');
     }
   })
 
@@ -148,6 +155,8 @@
     )) {
       node.textContent = 'Successfully!';
     }
+
+    $('.uploading-progress-area').removeClass('uploading');
 
     table_batch_files.ajax.reload();
   })
@@ -166,6 +175,8 @@
         node.innerHTML = message;
       }
     }
+
+    $('.uploading-progress-area').removeClass('uploading');
 
   })
 
