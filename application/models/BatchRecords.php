@@ -28,18 +28,30 @@ Class BatchRecords extends CI_Model
 		return $query_result;
 	}
 
+	public function loadByBatchFileIDAndTxnRef($batch_file_id, $txn_ref){
+		$query = "SELECT * FROM batch_records WHERE batch_file_id='".$batch_file_id."' AND transaction_ref='".$txn_ref."'";
+		$query_result = $this->db->query($query)->result_array();
+		
+		return $query_result;
+	}
+
 	public function updateApiResult($data) {
 		$query = "UPDATE batch_records SET txn_purpose='".$data['txn_purpose']."', resp_statusCode='".$data['statusCode']."', resp_rcvStatus='".$data['rcvStatus']."', resp_errorMsg='".$data['errorMsg']."' WHERE payment_seq='".$data['PaymentSeq']."' AND transaction_ref='".$data['txnRef']."'";
 
         return $this->db->query($query);
 	}
 
-	public function updateApiBulkResult($data) {
-		$query = "UPDATE batch_records SET resp_rcvStatus='".$data['resp_rcvStatus']."', resp_errorMsg='".$data['resp_errorMsg']."' WHERE transaction_ref='".$data['transaction_ref']."'";
+	public function updateBatchRecordApiBulkResult($data) {
+		$query = "UPDATE batch_records SET resp_rcvStatus='".$data['resp_rcvStatus']."', resp_errorMsg='".$data['resp_errorMsg']."' WHERE transaction_ref='".$data['transaction_ref']."' AND batch_file_id='".$data['batch_file_id']."'";
 
         return $this->db->query($query);
 	}
 
+	public function updateAllBatchRecordsApiBulkResult($data) {
+		$query = "UPDATE batch_records SET resp_rcvStatus='".$data['resp_rcvStatus']."', resp_errorMsg='".$data['resp_errorMsg']."' WHERE batch_file_id='".$data['batch_file_id']."'";
+
+        return $this->db->query($query);
+	}
 
 	public function updateApiResultByTxn($data) {
 		$query = "UPDATE batch_records SET resp_rcvStatus='".$data['resp_rcvStatus']."', resp_errorMsg='".$data['resp_errorMsg']."' WHERE transaction_ref='".$data['transaction_ref']."'";

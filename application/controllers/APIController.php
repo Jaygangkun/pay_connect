@@ -75,30 +75,20 @@ class APIController extends CI_Controller {
         $batch_file_id = $this->BatchFiles->getIDFromBatchNumber($body_data['BatchNumber']);
 
         if($batch_file_id) {
-            $batch_records = $this->BatchRecords->loadByBatchFileID($batch_file_id);
-            foreach($batch_records as $batch_record) {
-                $record_found = false;
-                foreach($txnReferences as $txnReference) {
-                    if($batch_record['transaction_ref'] == $txnReference['txnRef']) {
-                        $record_found = true;
-    
-                        $this->BatchRecords->updateApiBulkResult(array(
-                            'transaction_ref' => $txnReference['txnRef'],
-                            'resp_rcvStatus' => $txnReference['procStatus'],
-                            'resp_errorMsg' => $txnReference['errorMsg']
-                        ));
-    
-                        $txn_error_messages .= $txnReference['errorMsg']."<br>";
-    
-                        break;
-                    }
-                }
-                
-                if(!$record_found) {
-                    $this->BatchRecords->updateApiBulkResult(array(
-                        'transaction_ref' => $batch_record['transaction_ref'],
-                        'resp_rcvStatus' => $body_data['BatchStatus'],
-                        'resp_errorMsg' => ''
+            $this->BatchRecords->updateAllBatchRecordsApiBulkResult(array(
+                'batch_file_id' => $batch_file_id,
+                'resp_rcvStatus' => $body_data['BatchStatus'],
+                'resp_errorMsg' => ''
+            ));
+
+            foreach($txnReferences as $txnReference) {
+                $batch_records = $this->BatchRecords->loadByBatchFileIDAndTxnRef($batch_file_id, $txnReference['txnRef']);
+                if(count($batch_records) > 0) {
+                    $this->BatchRecords->updateBatchRecordApiBulkResult(array(
+                        'batch_file_id' => $batch_file_id,
+                        'transaction_ref' => $txnReference['txnRef'],
+                        'resp_rcvStatus' => $txnReference['procStatus'],
+                        'resp_errorMsg' => $txnReference['errorMsg']
                     ));
                 }
             }

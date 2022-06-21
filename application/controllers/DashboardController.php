@@ -305,7 +305,6 @@ class DashboardController extends CI_Controller {
 					'department' => $line[4],
 					'benef_bank' => $line[5],
 					'bank_biccode' => $line[6],
-					'status' => '', 
 					'uploader' => $_SESSION['user']['user_name']
 				);
 
