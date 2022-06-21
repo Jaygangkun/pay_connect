@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50505
 File Encoding         : 65001
 
-Date: 2022-06-18 06:33:51
+Date: 2022-06-20 20:48:47
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -30,19 +30,19 @@ CREATE TABLE `batch_files` (
   `batch_amount` varchar(255) DEFAULT NULL,
   `currency` varchar(10) DEFAULT NULL,
   `total_records` int(11) DEFAULT NULL,
+  `uploader` varchar(255) DEFAULT NULL,
+  `authoriser` varchar(255) DEFAULT NULL,
   `status` varchar(20) DEFAULT NULL COMMENT '1=>submitted,  2=>error, 3=>pending, 4=>authorised, 5=>processed, 6=>partial, 7=>acked, 8=>in_progress',
   `error_msg` text,
   `upload_at` datetime DEFAULT NULL,
   `submit_at` datetime DEFAULT NULL,
   `authorise_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=62 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of batch_files
 -- ----------------------------
-INSERT INTO `batch_files` VALUES ('46', 'MOF18062022BP0001', 'New-Header-Sample3Copy4.csv', 'MOF18062022BP0001', 'MTRF000000915', '1000115041', 'CLEARING ACCOUNT-USD', '8/26/2020', '34944.9', 'USD', '7', 'SUBMITTED', null, '2022-06-18 05:31:55', null, '2022-06-18 05:50:47');
-INSERT INTO `batch_files` VALUES ('47', 'MOF18062022BP0002', null, 'MOF18062022BP0002', null, 'werwer', '', '06/18/2022', '0.00', 'USD', '1', 'SUBMITTED', null, '2022-06-18 05:47:04', '2022-06-18 05:47:04', '2022-06-18 05:51:25');
 
 -- ----------------------------
 -- Table structure for `batch_records`
@@ -67,19 +67,11 @@ CREATE TABLE `batch_records` (
   `resp_errorMsg` varchar(255) DEFAULT NULL,
   `resp_statusCode` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=283 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=60130 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of batch_records
 -- ----------------------------
-INSERT INTO `batch_records` VALUES ('275', '46', '1', 'MOF18062022BP0001-0001', 'ABDINASIR ALI AHMED', '40900170001', '7755', 'Mashruuca RCRF', 'PREMEIR BANK', 'PBSMSOSM', 'jay1', 'jay1', 'test1', '0', 'NACKED', 'Not Processed', '77');
-INSERT INTO `batch_records` VALUES ('276', '46', '2', 'MOF18062022BP0001-0002', 'Mohamed Hassan Farah', '30106408001', '4163.4', 'Wasaaradda Arrimaha Gudaha iyo Fadaraalka', 'PREMEIR BANK', 'PBSMSOSM', 'jay1', 'jay1', 'test1', '0', 'NACKED', 'Not Processed', '77');
-INSERT INTO `batch_records` VALUES ('277', '46', '3', 'MOF18062022BP0001-0003', 'Liban Abdi Mohamud', '30915430', '3868.2', 'Mashruuca RCRF', 'SALAMA BANK', 'SSBMSOSM', 'jay1', 'jay1', 'test1', '0', 'NACKED', 'Not Processed', '77');
-INSERT INTO `batch_records` VALUES ('278', '46', '4', 'MOF18062022BP0001-0004', 'Mohamed Sheikh Axmed Mohamed', '0011384-5', '3056.4', 'Wasaaradda Arrimaha Gudaha iyo Fadaraalka', 'PREMEIR BANK', 'PBSMSOSM', 'jay1', 'jay1', 'test1', '0', 'NACKED', 'Not Processed', '77');
-INSERT INTO `batch_records` VALUES ('279', '46', '5', 'MOF18062022BP0001-0005', 'Boniface M Makumbi', '50910984001', '9990', 'SCORE PROJECT', 'PREMEIR BANK', 'PBSMSOSM', 'jay1', 'jay1', 'test1', '0', 'NACKED', 'Not Processed', '77');
-INSERT INTO `batch_records` VALUES ('280', '46', '6', 'MOF18062022BP0001-0006', 'JAZEERA PALCE HOTEL', '30098405', '3055.5', 'SCORE PROJECT', 'SALAMA BANK', 'SSBMSOSM', 'jay1', 'jay1', 'test1', '0', 'NACKED', 'Not Processed', '77');
-INSERT INTO `batch_records` VALUES ('281', '46', '7', 'MOF18062022BP0001-0007', 'Ali Adan Hassan', '112104335', '3056.4', 'Mashruuca RCRF', 'DAHABSHIL BANK INTERNATIONAL', 'DAHISOSM', 'jay1', 'jay1', 'test1', '0', 'NACKED', 'Not Processed', '77');
-INSERT INTO `batch_records` VALUES ('282', '47', '1', 'MOF18062022BP0002-0001', '', '', '', 'Mashruuca RCRF', 'part1s', 'PBSMSOSM', 'jay1', 'jay1', 'test1', '1', 'ACKED', 'Success', '00');
 
 -- ----------------------------
 -- Table structure for `departments`
@@ -168,9 +160,9 @@ CREATE TABLE `participants` (
 INSERT INTO `participants` VALUES ('1', 'PBSMSOSM', 'sort12', 'short1s', 'part1s', 'account1s', '20');
 INSERT INTO `participants` VALUES ('2', 'SSBMSOSM', 'sort2', 'short2', 'part2', 'account2', '22');
 INSERT INTO `participants` VALUES ('3', 'DAHISOSM', 'sort23', 'short23', 'part23', 'account23', '21');
-INSERT INTO `participants` VALUES ('4', 'bic123456789', 'sort245', 'short24578', 'part24578', 'account245', '22');
-INSERT INTO `participants` VALUES ('5', 'bic666', 'sort66', 'short666', 'part666', 'account666', '21');
-INSERT INTO `participants` VALUES ('6', 'bic1234567', 'sort67', 'short67', 'part67', 'accou67', '20');
+INSERT INTO `participants` VALUES ('4', 'DAHILARO', 'sort245', 'short24578', 'part24578', 'account245', '22');
+INSERT INTO `participants` VALUES ('5', 'PBSMLARO', 'sort66', 'short666', 'part666', 'account666', '21');
+INSERT INTO `participants` VALUES ('6', 'SSBMLARO', 'sort67', 'short67', 'part67', 'accou67', '20');
 
 -- ----------------------------
 -- Table structure for `txn_purpose`
@@ -200,7 +192,7 @@ CREATE TABLE `user_activities` (
   `date` datetime DEFAULT NULL,
   `activity` varchar(20) DEFAULT NULL COMMENT '1=>login, 2=>upload, 3=>submit',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=196 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=226 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of user_activities
@@ -400,6 +392,36 @@ INSERT INTO `user_activities` VALUES ('192', '1', '172.16.1.45', '2022-06-18 06:
 INSERT INTO `user_activities` VALUES ('193', '1', '172.16.1.45', '2022-06-18 06:23:36', 'logout');
 INSERT INTO `user_activities` VALUES ('194', '10', '172.16.1.45', '2022-06-18 06:30:31', 'login');
 INSERT INTO `user_activities` VALUES ('195', '10', '172.16.1.45', '2022-06-18 06:30:36', 'logout');
+INSERT INTO `user_activities` VALUES ('196', '9', '172.16.1.45', '2022-06-19 04:15:52', 'login');
+INSERT INTO `user_activities` VALUES ('197', '9', '172.16.1.45', '2022-06-19 04:21:29', 'logout');
+INSERT INTO `user_activities` VALUES ('198', '9', '172.16.1.45', '2022-06-20 06:15:33', 'login');
+INSERT INTO `user_activities` VALUES ('199', '9', '172.16.1.45', '2022-06-20 06:25:16', 'logout');
+INSERT INTO `user_activities` VALUES ('200', '9', '172.16.1.45', '2022-06-20 07:26:32', 'login');
+INSERT INTO `user_activities` VALUES ('201', '9', '172.16.1.45', '2022-06-20 07:38:43', 'logout');
+INSERT INTO `user_activities` VALUES ('202', '9', '172.16.1.45', '2022-06-20 07:39:16', 'login');
+INSERT INTO `user_activities` VALUES ('203', '9', '172.16.1.45', '2022-06-20 07:52:15', 'logout');
+INSERT INTO `user_activities` VALUES ('204', '9', '172.16.1.45', '2022-06-20 07:56:12', 'login');
+INSERT INTO `user_activities` VALUES ('205', '9', '172.16.1.45', '2022-06-20 08:17:58', 'login');
+INSERT INTO `user_activities` VALUES ('206', '9', '172.16.1.45', '2022-06-20 08:55:08', 'login');
+INSERT INTO `user_activities` VALUES ('207', '1', '172.16.1.45', '2022-06-20 09:38:58', 'login');
+INSERT INTO `user_activities` VALUES ('208', '1', '172.16.1.45', '2022-06-20 09:43:18', 'logout');
+INSERT INTO `user_activities` VALUES ('209', '9', '172.16.1.45', '2022-06-20 09:45:31', 'login');
+INSERT INTO `user_activities` VALUES ('210', '9', '172.16.1.45', '2022-06-20 09:51:10', 'login');
+INSERT INTO `user_activities` VALUES ('211', '9', '172.16.1.45', '2022-06-20 10:15:34', 'login');
+INSERT INTO `user_activities` VALUES ('212', '9', '172.16.1.45', '2022-06-20 10:16:28', 'authorise');
+INSERT INTO `user_activities` VALUES ('213', '9', '172.16.1.45', '2022-06-20 10:16:41', 'submit');
+INSERT INTO `user_activities` VALUES ('214', '9', '172.16.1.45', '2022-06-20 10:19:59', 'submit');
+INSERT INTO `user_activities` VALUES ('215', '9', '172.16.1.45', '2022-06-20 10:21:21', 'authorise');
+INSERT INTO `user_activities` VALUES ('216', '9', '172.16.1.45', '2022-06-20 10:30:34', 'login');
+INSERT INTO `user_activities` VALUES ('217', '9', '172.16.1.45', '2022-06-20 10:46:16', 'login');
+INSERT INTO `user_activities` VALUES ('218', '1', '172.16.1.45', '2022-06-20 10:56:26', 'login');
+INSERT INTO `user_activities` VALUES ('219', '1', '172.16.1.45', '2022-06-20 10:57:24', 'logout');
+INSERT INTO `user_activities` VALUES ('220', '9', '172.16.1.45', '2022-06-20 10:57:31', 'login');
+INSERT INTO `user_activities` VALUES ('221', '9', '172.16.1.45', '2022-06-20 12:02:35', 'login');
+INSERT INTO `user_activities` VALUES ('222', '9', '172.16.1.45', '2022-06-20 13:00:41', 'login');
+INSERT INTO `user_activities` VALUES ('223', '9', '172.16.1.45', '2022-06-20 19:50:56', 'login');
+INSERT INTO `user_activities` VALUES ('224', '9', '172.16.1.45', '2022-06-20 20:22:36', 'login');
+INSERT INTO `user_activities` VALUES ('225', '9', '172.16.1.45', '2022-06-20 20:33:49', 'login');
 
 -- ----------------------------
 -- Table structure for `user_roles`
@@ -454,7 +476,7 @@ INSERT INTO `users` VALUES ('5', 'werwer1', null, 'wer1', '123123@234234', '2,3'
 INSERT INTO `users` VALUES ('6', 'wewe__', null, 'wer__', 'rwer111__', '4', '6', 'werwer___', '0', null, null, null);
 INSERT INTO `users` VALUES ('7', 'test1', null, 'test', 'test12', '4', '1', 'asdfasdf', '0', null, null, null);
 INSERT INTO `users` VALUES ('8', 'jay13', '', 'jay1212', 'jau', '2', '1', '', 'active', null, null, null);
-INSERT INTO `users` VALUES ('9', 'jay1', '*06C0BF5B64ECE2F648B5F048A71903906BA08E5C', 'jay1212', 'jaygangkun@hotmail.com1', '2', '1', '', 'active', '1', '', '0');
+INSERT INTO `users` VALUES ('9', 'jay1', '*06C0BF5B64ECE2F648B5F048A71903906BA08E5C', 'jay1212', 'jaygangkun@hotmail.com1', '2', '1', '', 'active', '1', '', '1');
 INSERT INTO `users` VALUES ('10', 'jay2', '*BC875279CA91B6EC7CB9573F396FEE2EEBF2967D', 'jay1212', 'jaygangkun@hotmail.com', '2,8', '1', '', '0', '1', '', '0');
 INSERT INTO `users` VALUES ('12', 'jay16', '*94BDCEBE19083CE2A1F959FD02F964C7AF4CFC29', 'asdwer', 'jau', '', '2', '', '0', null, null, null);
 INSERT INTO `users` VALUES ('13', 'jay17', '*94BDCEBE19083CE2A1F959FD02F964C7AF4CFC29', 'asdwer', 'jau1', '', '2', '', '0', null, null, null);
