@@ -266,6 +266,7 @@ class DashboardController extends CI_Controller {
 						'currency' => $currency,
 						'total_records' => $total_records,
 						'status' => 'UPLOADED',
+						'uploader' => $_SESSION['user']['user_name']
 					);
 					$batch_total_amount = floatval($batch_amount);
 					$line_index ++;
@@ -345,17 +346,20 @@ class DashboardController extends CI_Controller {
 
 			$batch_file_id = $this->BatchFiles->add($batch_files_add_item);
 
+			$batch_records_bulk_data = array();
 			foreach($batch_records_add_list as $batch_records_add_item) {
 				$new_batch_records_add_item = $batch_records_add_item;
 				$new_batch_records_add_item['batch_file_id'] = $batch_file_id;
 			
 				//RB	$new_batch_records_add_item['transaction_ref'] = genTransactionRef($batch_file_id);
 
-			    $new_batch_records_add_item['transaction_ref'] = genTransactionRef($batch_file_id);
-				
+			    $new_batch_records_add_item['transaction_ref'] = genTransactionRef($batch_file_id, $new_batch_records_add_item['payment_seq']);
 
-				$this->BatchRecords->add($new_batch_records_add_item);
+				$batch_records_bulk_data[] = $new_batch_records_add_item;
 			}
+
+			$this->BatchRecords->addBulk($batch_records_bulk_data);
+
 
 			echo json_encode(array(
 				'success' => true
@@ -398,6 +402,15 @@ class DashboardController extends CI_Controller {
 		$id = isset($_POST['id']) ? $_POST['id'] : null;
 		if($id) {
 			$batch_file = $this->BatchFiles->getByID($id);
+			if(!$batch_file) {
+				echo json_encode(array(
+					'success' => false,
+					'message' => 'No Found Batch File'
+				));
+				return;
+			}
+
+			
 			$batch_records = $this->BatchRecords->loadByBatchFileID($id);
 
 			$batch_file_submit_error = false;
@@ -479,9 +492,7 @@ class DashboardController extends CI_Controller {
 					$api_txn_count = 0;
 					$api_txn_data = array();
 					continue;
-				}
-
-				
+				}					
 			}
 
 			if(count($api_txn_data) > 0) {
@@ -531,7 +542,7 @@ class DashboardController extends CI_Controller {
 				}
 			}
 
-			$this->BatchFiles->updateStatus($id, 'SUBMITTED');
+			$this->BatchFiles->setSubmitted($id);
 
 			$this->UserActivities->add(array(
 				'user_id' => $_SESSION['user']['id'],
@@ -554,7 +565,7 @@ class DashboardController extends CI_Controller {
 	public function apiAuthoriseBatchFile() {
 		$id = isset($_POST['id']) ? $_POST['id'] : null;
 		if($id) {
-			$this->BatchFiles->updateStatus($id, 'AUTHORISED');
+			$this->BatchFiles->setAuthorised($id, $_SESSION['user']['user_name']);
 			$this->BatchRecords->updateAuthoriseByBatchFile($id, $_SESSION['user']['user_name'], 'AUTHORISED');
 
 			$this->UserActivities->add(array(
@@ -745,7 +756,7 @@ class DashboardController extends CI_Controller {
 			return;
 		}
 
-		$batch_file_id = $this->BatchFiles->addRefID($batch_ref);
+		$batch_file_id = $this->BatchFiles->addRefID($batch_ref, $_SESSION['user']['user_name']);
 		$payment_seq = count($this->BatchRecords->loadByBatchFileID($batch_file_id)) + 1;
 
 		$this->BatchRecords->add(array(
@@ -759,7 +770,6 @@ class DashboardController extends CI_Controller {
 			'benef_bank' => $benef_bank,
 			'bank_biccode' => $bank_biccode,
 			'txn_purpose' => $txn_purpose,
-			'status' => '1', 
 			'uploader' => $_SESSION['user']['user_name']
 		));
 

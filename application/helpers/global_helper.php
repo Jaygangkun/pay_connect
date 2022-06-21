@@ -260,11 +260,12 @@ if(!function_exists('apiBuilkUpload')){
 					),
 				));
 		
-				$response = curl_exec($curl);
-		
 				writeLog('>>>>>>>>api calling'.$gateway->endpoint);
 				writeLog('>>>>>>>>post_fields');
 				writeLog($post_fields);
+
+				$response = curl_exec($curl);
+		
 				writeLog('>>>>>>>>response');
 				writeLog($response);
 				
@@ -315,7 +316,7 @@ if(!function_exists('genBatchNumber')){
 }
 
 if(!function_exists('genTransactionRef')){
-    function genTransactionRef($batch_file_id){
+    function genTransactionRef($batch_file_id, $paramNNN = null){
 		$date = new DateTime();
 		$DDMMYYYY = $date->format('d').$date->format('m').$date->format('Y');
 		$NNNN = 1;
@@ -352,6 +353,10 @@ if(!function_exists('genTransactionRef')){
 			$batch_ref = genBatchNumber();
 		}
 		
+		if($paramNNN) {
+			$NNNN = $paramNNN;
+		}
+
 		$NNNN = str_pad($NNNN, 4, '0', STR_PAD_LEFT);
 
 		//RB	return "MOF".$DDMMYYYY.$NNNN;

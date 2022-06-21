@@ -6,16 +6,19 @@ if (!defined('BASEPATH'))
 Class BatchRecords extends CI_Model
 {
 	public function add($data){
-		if(isset($data['txn_purpose'])) {
-			$query = "INSERT INTO batch_records(`batch_file_id`, `payment_seq`, `transaction_ref`, `beneficiary_name`, `account_number`, `amount_pay`, `department`, `benef_bank`, `bank_biccode`, `uploader`, `txn_purpose`, `status`) VALUES(".$this->db->escape($data['batch_file_id']).", ".$this->db->escape($data['payment_seq']).", ".$this->db->escape($data['transaction_ref']).", ".$this->db->escape($data['beneficiary_name']).", ".$this->db->escape($data['account_number']).", ".$this->db->escape($data['amount_pay']).", ".$this->db->escape($data['department']).", ".$this->db->escape($data['benef_bank']).", ".$this->db->escape($data['bank_biccode']).", ".$this->db->escape($data['uploader']).", '".$data['txn_purpose']."', ".$this->db->escape($data['status']).")";
-		}
-		else {
-			$query = "INSERT INTO batch_records(`batch_file_id`, `payment_seq`, `transaction_ref`, `beneficiary_name`, `account_number`, `amount_pay`, `department`, `benef_bank`, `bank_biccode`, `uploader`, `status`) VALUES(".$this->db->escape($data['batch_file_id']).", ".$this->db->escape($data['payment_seq']).", ".$this->db->escape($data['transaction_ref']).", ".$this->db->escape($data['beneficiary_name']).", ".$this->db->escape($data['account_number']).", ".$this->db->escape($data['amount_pay']).", ".$this->db->escape($data['department']).", ".$this->db->escape($data['benef_bank']).", ".$this->db->escape($data['bank_biccode']).", ".$this->db->escape($data['uploader']).", ".$this->db->escape($data['status']).")";
-		}
+		
+		$query = "INSERT INTO batch_records(`batch_file_id`, `payment_seq`, `transaction_ref`, `beneficiary_name`, `account_number`, `amount_pay`, `department`, `benef_bank`, `bank_biccode`, `uploader`, `txn_purpose`) VALUES(".$this->db->escape($data['batch_file_id']).", ".$this->db->escape($data['payment_seq']).", ".$this->db->escape($data['transaction_ref']).", ".$this->db->escape($data['beneficiary_name']).", ".$this->db->escape($data['account_number']).", ".$this->db->escape($data['amount_pay']).", ".$this->db->escape($data['department']).", ".$this->db->escape($data['benef_bank']).", ".$this->db->escape($data['bank_biccode']).", ".$this->db->escape($data['uploader']).", '".$data['txn_purpose']."')";
 		
         $this->db->query($query);
 
 		return $this->db->insert_id();
+	}
+
+	public function addBulk($bulk){
+
+        $this->db->insert_batch('batch_records', $bulk);
+
+		return;
 	}
 
 	public function loadByBatchFileID($batch_file_id){
