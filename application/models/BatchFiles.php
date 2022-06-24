@@ -126,8 +126,8 @@ Class BatchFiles extends CI_Model
         return $this->db->query($query);
 	}
 
-	public function setSubmitted($id) {
-		$query = "UPDATE batch_files SET `status`='SUBMITTED', submit_at=NOW()  WHERE id='".$id."'";
+	public function setSubmitted($id, $purpose) {
+		$query = "UPDATE batch_files SET `status`='SUBMITTED', `submit_requested`=1, `submit_purpose`='".$purpose."',submit_at=NOW()  WHERE id='".$id."'";
 
         return $this->db->query($query);
 	}
@@ -149,5 +149,12 @@ Class BatchFiles extends CI_Model
 		}
 
 		return null;
+	}
+
+	public function getSubmitRequsted(){
+		$query = "SELECT * FROM batch_files WHERE `submit_requested`=1";
+		$query_result = $this->db->query($query)->result_array();
+		
+		return $query_result;
 	}
 }

@@ -127,3 +127,6 @@ $route['api-user-role-add'] = 'DashboardController/apiUserRoleAdd';
 $route['api-auto-logout'] = 'DashboardController/apiAutoLogout';
 // Global APIS
 $route['pay-update'] = 'APIController/payUpdate';
+
+// cron job
+$route['process-pending-batch-file'] = 'APIController/processPendingBatchFile';

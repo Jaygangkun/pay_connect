@@ -120,4 +120,125 @@ class APIController extends CI_Controller {
             'success' => true
         ));
     }
+
+    public function processPendingBatchFile() {
+        set_time_limit(0);
+        $batch_files = $this->BatchFiles->getSubmitRequsted();
+        foreach($batch_files as $batch_file) {
+            writeLog('*****cronjob processPendingBatchFile start:'.$batch_file['id']);
+
+            $batch_records = $this->BatchRecords->loadByBatchFileID($batch_file['id']);
+
+			$batch_file_submit_error = false;
+			$api_txn_count = 0;
+			$api_txn_data = array();
+			foreach($batch_records as $batch_record) {
+				$date = new DateTime();				
+				$api_txn_data[] = array(
+					'PaymentSeq' => $batch_record['payment_seq'],
+					'txnRef' => $batch_record['transaction_ref'],
+					'txnCurr' => $batch_file['currency'],
+					'settlementDate' => $date->format('Y').$date->format('m').$date->format('d'),
+					'ordCustAccount' => $batch_file['account'],
+					'ordCusName' => $batch_file['ordCust_name'],
+					'benDepart' => $batch_record['department'],
+					'txnPurpose' => $batch_file['submit_purpose'],
+					'benBankBIC' => $batch_record['bank_biccode'],
+					'benAccount' => $batch_record['account_number'],
+					'benName' => $batch_record['beneficiary_name'],
+					'benCrAmount' => $batch_record['amount_pay'],
+					'batchInputter' => $batch_record['uploader'],
+					'batchAuthoriser' => $batch_record['authoriser'],
+					'processDate' => $date->format('Y').$date->format('m').$date->format('d'),
+					'processTime' => $date->format('H').$date->format('i').$date->format('s')
+				);
+
+				$api_txn_count++;
+				if($api_txn_count == $this->config->item('api_txn_limit')) {
+					
+					$resp = apiBuilkUpload(array(
+						'processType' => $this->config->item('api_process_type'),
+						'BatchNumber' => $batch_file['batch_number'],
+						'BatchAmount' => $batch_file['batch_amount'],
+						'NoOfPayment' => $batch_file['total_records'],
+						'batchDate' => $date->format('Y').$date->format('m').$date->format('d'),
+						'txnReferences' => $api_txn_data
+					));
+
+					if(isset($resp['server_error']) && $resp['server_error']) {
+                        writeLog('*****cronjob processPendingBatchFile failed:'.$resp['error_message']);
+						return;
+					}
+	
+					if(isset($resp['error'])) {
+                        writeLog('*****cronjob processPendingBatchFile failed:'.$resp['error'].' '.$resp['path']);
+						return;
+					}
+
+
+					if(isset($resp['txnReferences'])) {
+						foreach($resp['txnReferences'] as $txn_reference) {
+							$this->BatchRecords->updateApiResult(array(
+								'PaymentSeq' => $txn_reference['PaymentSeq'],
+								'txnRef' => $txn_reference['txnRef'],
+								'txn_purpose' => $batch_file['submit_purpose'],
+								'rcvStatus' => $txn_reference['rcvStatus'],
+								'statusCode' => $txn_reference['statusCode'],
+								'errorMsg' => $txn_reference['errorMsg'],
+							));
+						}
+					}
+					else {
+                        writeLog('*****cronjob processPendingBatchFile failed: No get Response from API');
+						return;
+					}
+	
+					$api_txn_count = 0;
+					$api_txn_data = array();
+					continue;
+				}					
+			}
+
+			if(count($api_txn_data) > 0) {
+				$resp = apiBuilkUpload(array(
+					'processType' => $this->config->item('api_process_type'),
+					'BatchNumber' => $batch_file['batch_number'],
+					'BatchAmount' => $batch_file['batch_amount'],
+					'NoOfPayment' => $batch_file['total_records'],
+					'batchDate' => $date->format('Y').$date->format('m').$date->format('d'),
+					'txnReferences' => $api_txn_data
+				));
+
+				if(isset($resp['server_error']) && $resp['server_error']) {
+                    writeLog('*****cronjob processPendingBatchFile failed:'.$resp['error_message']);
+					return;
+				}
+
+				if(isset($resp['error'])) {
+                    writeLog('*****cronjob processPendingBatchFile failed:'.$resp['error'].' '.$resp['path']);
+					return;
+				}
+
+				if(isset($resp['txnReferences'])) {
+					foreach($resp['txnReferences'] as $txn_reference) {
+						$this->BatchRecords->updateApiResult(array(
+							'PaymentSeq' => $txn_reference['PaymentSeq'],
+							'txnRef' => $txn_reference['txnRef'],
+							'txn_purpose' => $batch_file['submit_purpose'],
+							'rcvStatus' => $txn_reference['rcvStatus'],
+							'statusCode' => $txn_reference['statusCode'],
+							'errorMsg' => $txn_reference['errorMsg'],
+						));
+					}
+				}
+				else {
+                    writeLog('*****cronjob processPendingBatchFile failed: No get Response from API');
+					return;
+				}
+			}
+
+            writeLog('*****cronjob processPendingBatchFile finish:'.$batch_file['id']);
+
+        }
+    }
 }

@@ -221,6 +221,7 @@ if(!function_exists('statusColor')){
 
 if(!function_exists('apiBuilkUpload')){
     function apiBuilkUpload($data){		
+		set_time_limit(0);
 		$ci =& get_instance();
 		$ci->load->database();
 		$sql = "SELECT * FROM gateways WHERE status='Active'";
@@ -255,7 +256,7 @@ if(!function_exists('apiBuilkUpload')){
 					CURLOPT_POSTFIELDS =>$post_fields,
 					CURLOPT_HTTPHEADER => array(
 						'Authorization: '.$gateway->auth,
-						'Content-Type: text/plain',
+						'Content-Type: text/json',
 						'Cookie: JSESSIONID=F6D1AB7C27064B724868303B94CCB76D'
 					),
 				));
