@@ -123,11 +123,12 @@ class APIController extends CI_Controller {
 
     public function processPendingBatchFile() {
         set_time_limit(0);
+        writeLog('*****cronjob processPendingBatchFile START*****');
         $batch_files = $this->BatchFiles->getSubmitRequsted();
         foreach($batch_files as $batch_file) {
             writeLog('*****cronjob processPendingBatchFile start:'.$batch_file['id']);
 
-            $batch_records = $this->BatchRecords->loadByBatchFileID($batch_file['id']);
+            $batch_records = $this->BatchRecords->loadUnProcessedByBatchFileID($batch_file['id']);
 
 			$batch_file_submit_error = false;
 			$api_txn_count = 0;
@@ -239,6 +240,9 @@ class APIController extends CI_Controller {
 
             writeLog('*****cronjob processPendingBatchFile finish:'.$batch_file['id']);
 
+            $this->BatchFiles->doneSubmittedRequest($batch_file['id']);
         }
+
+        writeLog('*****cronjob processPendingBatchFile END*****');
     }
 }

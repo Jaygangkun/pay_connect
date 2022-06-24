@@ -28,6 +28,13 @@ Class BatchRecords extends CI_Model
 		return $query_result;
 	}
 
+	public function loadUnProcessedByBatchFileID($batch_file_id){
+		$query = "SELECT * FROM batch_records WHERE batch_file_id='".$batch_file_id."' AND `processed` != 1";
+		$query_result = $this->db->query($query)->result_array();
+		
+		return $query_result;
+	}
+
 	public function loadByBatchFileIDAndTxnRef($batch_file_id, $txn_ref){
 		$query = "SELECT * FROM batch_records WHERE batch_file_id='".$batch_file_id."' AND transaction_ref='".$txn_ref."'";
 		$query_result = $this->db->query($query)->result_array();
@@ -36,7 +43,7 @@ Class BatchRecords extends CI_Model
 	}
 
 	public function updateApiResult($data) {
-		$query = "UPDATE batch_records SET txn_purpose='".$data['txn_purpose']."', resp_statusCode='".$data['statusCode']."', resp_rcvStatus='".$data['rcvStatus']."', resp_errorMsg='".$data['errorMsg']."' WHERE payment_seq='".$data['PaymentSeq']."' AND transaction_ref='".$data['txnRef']."'";
+		$query = "UPDATE batch_records SET txn_purpose='".$data['txn_purpose']."', resp_statusCode='".$data['statusCode']."', resp_rcvStatus='".$data['rcvStatus']."', resp_errorMsg='".$data['errorMsg']."', `processed`=1 WHERE payment_seq='".$data['PaymentSeq']."' AND transaction_ref='".$data['txnRef']."'";
 
         return $this->db->query($query);
 	}

@@ -132,6 +132,12 @@ Class BatchFiles extends CI_Model
         return $this->db->query($query);
 	}
 
+	public function doneSubmittedRequest($id) {
+		$query = "UPDATE batch_files SET `submit_requested`='' WHERE id='".$id."'";
+
+        return $this->db->query($query);
+	}
+
 	public function manualSubmit($data) {
 		$query = "UPDATE batch_files SET account='".$data['account']."', ordCust_name='".$data['ordCust_name']."', batch_amount= cast(batch_amount AS DECIMAL(10, 2)) + cast('".$data['batch_amount']."' AS DECIMAL(10, 2)), currency='".$data['currency']."', total_records='".$data['total_records']."', `status`='UPLOADED', `date`='".$data['date']."' WHERE id='".$data['id']."'";
 

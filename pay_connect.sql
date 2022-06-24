@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50505
 File Encoding         : 65001
 
-Date: 2022-06-20 20:48:47
+Date: 2022-06-24 19:43:13
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -34,11 +34,13 @@ CREATE TABLE `batch_files` (
   `authoriser` varchar(255) DEFAULT NULL,
   `status` varchar(20) DEFAULT NULL COMMENT '1=>submitted,  2=>error, 3=>pending, 4=>authorised, 5=>processed, 6=>partial, 7=>acked, 8=>in_progress',
   `error_msg` text,
+  `submit_requested` tinyint(4) DEFAULT NULL,
+  `submit_purpose` varchar(100) DEFAULT NULL,
   `upload_at` datetime DEFAULT NULL,
   `submit_at` datetime DEFAULT NULL,
   `authorise_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=62 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of batch_files
@@ -62,12 +64,12 @@ CREATE TABLE `batch_records` (
   `uploader` varchar(255) DEFAULT NULL,
   `authoriser` varchar(255) DEFAULT NULL,
   `txn_purpose` varchar(255) DEFAULT NULL,
-  `status` tinyint(1) DEFAULT NULL COMMENT '1=>submitted,  2=>error, 3=>pending',
+  `processed` tinyint(4) DEFAULT NULL,
   `resp_rcvStatus` varchar(10) DEFAULT NULL,
   `resp_errorMsg` varchar(255) DEFAULT NULL,
   `resp_statusCode` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=60130 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=140137 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of batch_records
@@ -152,7 +154,7 @@ CREATE TABLE `participants` (
   `account_number` varchar(255) DEFAULT NULL,
   `status` varchar(10) DEFAULT NULL COMMENT '20=>active,  21=>suspended, 22=>insolvent, 23=>liquidated',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of participants
@@ -163,6 +165,7 @@ INSERT INTO `participants` VALUES ('3', 'DAHISOSM', 'sort23', 'short23', 'part23
 INSERT INTO `participants` VALUES ('4', 'DAHILARO', 'sort245', 'short24578', 'part24578', 'account245', '22');
 INSERT INTO `participants` VALUES ('5', 'PBSMLARO', 'sort66', 'short666', 'part666', 'account666', '21');
 INSERT INTO `participants` VALUES ('6', 'SSBMLARO', 'sort67', 'short67', 'part67', 'accou67', '20');
+INSERT INTO `participants` VALUES ('7', 'DAHISOSO', 'aaa', 'bbb', 'cc', null, null);
 
 -- ----------------------------
 -- Table structure for `txn_purpose`
@@ -178,8 +181,8 @@ CREATE TABLE `txn_purpose` (
 -- ----------------------------
 -- Records of txn_purpose
 -- ----------------------------
-INSERT INTO `txn_purpose` VALUES ('1', 'test1', 'aaaaa');
-INSERT INTO `txn_purpose` VALUES ('3', 'test3', 'aww');
+INSERT INTO `txn_purpose` VALUES ('1', 'SALA', 'aaaaa');
+INSERT INTO `txn_purpose` VALUES ('3', 'CONT', 'aww');
 
 -- ----------------------------
 -- Table structure for `user_activities`
@@ -192,7 +195,7 @@ CREATE TABLE `user_activities` (
   `date` datetime DEFAULT NULL,
   `activity` varchar(20) DEFAULT NULL COMMENT '1=>login, 2=>upload, 3=>submit',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=226 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=238 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of user_activities
@@ -422,6 +425,18 @@ INSERT INTO `user_activities` VALUES ('222', '9', '172.16.1.45', '2022-06-20 13:
 INSERT INTO `user_activities` VALUES ('223', '9', '172.16.1.45', '2022-06-20 19:50:56', 'login');
 INSERT INTO `user_activities` VALUES ('224', '9', '172.16.1.45', '2022-06-20 20:22:36', 'login');
 INSERT INTO `user_activities` VALUES ('225', '9', '172.16.1.45', '2022-06-20 20:33:49', 'login');
+INSERT INTO `user_activities` VALUES ('226', '9', '172.16.1.45', '2022-06-21 08:52:45', 'login');
+INSERT INTO `user_activities` VALUES ('227', '9', '172.16.1.45', '2022-06-21 08:53:05', 'authorise');
+INSERT INTO `user_activities` VALUES ('228', '9', '172.16.1.45', '2022-06-21 08:53:20', 'submit');
+INSERT INTO `user_activities` VALUES ('229', '9', '172.16.1.45', '2022-06-21 10:52:39', 'login');
+INSERT INTO `user_activities` VALUES ('230', '9', '172.16.1.45', '2022-06-21 10:54:59', 'authorise');
+INSERT INTO `user_activities` VALUES ('231', '9', '172.16.1.45', '2022-06-22 07:32:50', 'login');
+INSERT INTO `user_activities` VALUES ('232', '9', '172.16.1.45', '2022-06-22 07:40:13', 'authorise');
+INSERT INTO `user_activities` VALUES ('233', '9', '172.16.1.45', '2022-06-22 07:47:38', 'authorise');
+INSERT INTO `user_activities` VALUES ('234', '9', '172.16.1.45', '2022-06-22 07:59:07', 'login');
+INSERT INTO `user_activities` VALUES ('235', '9', '172.16.1.45', '2022-06-23 23:48:27', 'login');
+INSERT INTO `user_activities` VALUES ('236', '9', '172.16.1.45', '2022-06-23 23:49:27', 'authorise');
+INSERT INTO `user_activities` VALUES ('237', '9', '172.16.1.45', '2022-06-23 23:51:57', 'submit');
 
 -- ----------------------------
 -- Table structure for `user_roles`
