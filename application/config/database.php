@@ -76,13 +76,9 @@ $query_builder = TRUE;
 $db['default'] = array(
 	'dsn'	=> '',
 	'hostname' => 'localhost',
-	'username' => 'root',
-	'password' => 'root',
-	'database' => 'pay_connect',
-
-	// 'username' => 'clinicor_rss',
-	// 'password' => '8^BhZyBC5l&B',
-	// 'database' => 'clinicor_rss',
+	'username' => '',
+	'password' => '',
+	'database' => '',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
